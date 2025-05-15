@@ -1,0 +1,43 @@
+Funcionalidades do MVP
+
+	1. Cadastro e autenticação
+		Cadastro de usuário (nome, e-mail, senha)
+
+		Login com autenticação segura (JWT ou sessão)
+
+		Recuperação de senha (básica por e-mail, opcional no MVP)
+
+	2. Cadastro de entradas e saídas
+		Adicionar receita (valor, data, descrição, categoria opcional)
+
+		Adicionar despesa (valor, data, descrição, categoria opcional)
+
+		Editar e excluir lançamentos
+
+		Campo “forma de pagamento” (opcional)
+
+	3. Dashboard/resumo financeiro
+		Saldo atual (receitas - despesas)
+
+		Total de receitas e despesas no mês atual
+
+		Gráfico simples (pizza ou barra) com categorias ou comparação mês a mês
+
+	4. Categorias financeiras
+		Lista de categorias padrão (ex: alimentação, transporte, vendas etc.)
+
+		Criar categorias personalizadas (opcional no MVP)
+
+	5. Perfil do usuário
+		Visualizar/editar dados do usuário
+
+		Alterar senha
+
+
+
+Estrutura de dados (mínima)
+	User: id, nome, email, senha, dataCadastro
+
+	Transaction: id, userId, tipo (receita ou despesa), valor, data, descrição, categoria
+
+	Categoria: id, userId (ou null para padrão), nome, tipo
