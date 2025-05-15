@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/contasimples
+    url: jdbc:postgresql://localhost:5432/contasimplesmei
     username: postgres
     password: postgres
   jpa:
