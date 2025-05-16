@@ -1,7 +1,12 @@
 package com.contasimplesmei.controller
 
+import com.contasimplesmei.dto.ReceitaRequestDTO
+import com.contasimplesmei.dto.ReceitaResponseDTO
+import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.model.Receita
 import com.contasimplesmei.service.ReceitaService
+import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -21,25 +26,28 @@ class ReceitaController(
 ) {
 
     @GetMapping
-    fun listar(): ResponseEntity<List<Receita>> = ResponseEntity.ok(service.listarTodas())
+    fun listar(): ResponseEntity<List<ReceitaResponseDTO>> {
+        val receitas = service.listarTodas().map { it.toResponseDTO() }
+        return ResponseEntity.ok(receitas)
+    }
 
     @GetMapping("/{id}")
-    fun buscarPorId(@PathVariable id: UUID): ResponseEntity<Receita> {
+    fun buscarPorId(@PathVariable id: UUID): ResponseEntity<ReceitaResponseDTO> {
         val receita = service.buscarPorId(id)
-        return if (receita != null) ResponseEntity.ok(receita)
+        return if (receita != null) ResponseEntity.ok(receita.toResponseDTO())
         else ResponseEntity.notFound().build()
     }
 
     @PostMapping
-    fun criar(@RequestBody receita: Receita): ResponseEntity<Receita> {
-        val nova = service.criar(receita)
-        return ResponseEntity.created(URI.create("/receitas/${nova.id}")).body(nova)
+    fun criar(@RequestBody @Valid dto: ReceitaRequestDTO): ResponseEntity<ReceitaResponseDTO> {
+        val receita = service.criar(dto)
+        return ResponseEntity.status(HttpStatus.CREATED).body(receita.toResponseDTO())
     }
 
     @PutMapping("/{id}")
-    fun atualizar(@PathVariable id: UUID, @RequestBody receita: Receita): ResponseEntity<Receita> {
-        val atualizada = service.atualizar(id, receita)
-        return if (atualizada != null) ResponseEntity.ok(atualizada)
+    fun atualizar(@PathVariable id: UUID, @RequestBody dto: ReceitaRequestDTO): ResponseEntity<ReceitaResponseDTO> {
+        val receita = service.atualizar(id, dto)
+        return if (receita != null) ResponseEntity.ok(receita.toResponseDTO())
         else ResponseEntity.notFound().build()
     }
 
