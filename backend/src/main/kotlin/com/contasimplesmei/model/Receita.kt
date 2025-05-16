@@ -14,7 +14,7 @@ data class Receita(
 
     @Id
     @GeneratedValue
-    val id: UUID,
+    val id: UUID? = null,
 
     val descricao: String,
     val valor: BigDecimal,
