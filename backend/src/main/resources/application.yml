@@ -13,4 +13,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
+  security:
+    user:
+      password: dummy
