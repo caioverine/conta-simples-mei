@@ -4,12 +4,12 @@ import com.contasimplesmei.dto.UsuarioRequestDTO
 import com.contasimplesmei.dto.UsuarioResponseDTO
 import com.contasimplesmei.model.Usuario
 
-fun UsuarioRequestDTO.toEntity(): Usuario =
+fun UsuarioRequestDTO.toEntity(senhaCriptografada: String): Usuario =
     Usuario(
         id = null,
         nome = this.nome,
         email = this.email,
-        senha = this.senha,
+        senha = senhaCriptografada,
         perfil = this.perfil
     )
 
