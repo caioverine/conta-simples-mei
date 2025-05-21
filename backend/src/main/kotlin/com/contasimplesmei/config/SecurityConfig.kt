@@ -28,6 +28,9 @@ class SecurityConfig(
                 it.requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                 it.requestMatchers("/auth/**").permitAll()
                 it.requestMatchers("/public/**").permitAll()
+                it.requestMatchers("/v3/api-docs/**").permitAll()
+                it.requestMatchers("/swagger-ui/**").permitAll()
+                it.requestMatchers("/swagger-ui.html").permitAll()
                 it.anyRequest().authenticated()
             }
             .sessionManagement {
