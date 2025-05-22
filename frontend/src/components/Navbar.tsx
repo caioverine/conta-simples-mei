@@ -11,12 +11,16 @@ export default function Navbar() {
   };
 
   return (
-    <header className="bg-white shadow p-4 flex justify-between items-center">
-      <h1 className="text-xl font-semibold text-gray-800">Conta Simples MEI</h1>
-      <div>
-        {/* Aqui pode ir avatar, nome do usuário ou botão de logout */}
-        <button className="text-sm text-blue-500 hover:underline" onClick={handleLogout}>Sair</button>
+    <nav className="container p-6 mx-auto lg:flex lg:justify-between lg:items-center">
+      <div className="flex items-center justify-between">
+        Conta Simples MEI
       </div>
-    </header>
+      <div className="flex">
+        <button className="text-gray-500 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400 focus:outline-none focus:text-gray-600 dark:focus:text-gray-400" 
+          onClick={handleLogout}>
+            Sair
+        </button>
+      </div>
+    </nav>
   );
 }

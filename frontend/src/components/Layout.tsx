@@ -9,12 +9,14 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="flex h-screen">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Navbar />
-        <main className="flex-1 p-4 bg-gray-100 overflow-y-auto">{children}</main>
+    <section className="bg-white dark:bg-gray-900">
+      <div className="flex h-screen">
+        <Sidebar />
+        <div className="flex-1 flex flex-col">
+          <Navbar />
+            <main >{children}</main>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
