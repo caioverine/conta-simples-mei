@@ -1,15 +1,22 @@
 import React, { useState } from "react";
 import type { ReceitaFormData } from "../components/ModalNovaReceita";
 import ModalNovaReceita from "../components/ModalNovaReceita";
+import { salvarReceita } from "../services/receita-service";
 
 const Receitas = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [receitas, setReceitas] = useState<ReceitaFormData[]>([]);
 
-    const handleNovaReceita = (novaReceita: ReceitaFormData) => {
-        setReceitas((prev) => [...prev, novaReceita]);
-        // Aqui futuramente será feita uma chamada POST para o backend
-    };
+    const handleNovaReceita = async (novaReceita: ReceitaFormData) => {
+    try {
+        await salvarReceita(novaReceita);
+        setReceitas((prev) => [...prev, novaReceita]); // opcional: recarregar lista do backend
+        alert("Receita cadastrada com sucesso!");
+    } catch (error) {
+        console.error("Erro ao salvar receita", error);
+        alert("Erro ao salvar receita. Verifique os dados e tente novamente.");
+    }
+};
     return (
         <div className="p-6">
         <div className="flex justify-between items-center mb-4">
