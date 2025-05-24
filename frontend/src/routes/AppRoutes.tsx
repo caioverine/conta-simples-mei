@@ -4,13 +4,15 @@ import Dashboard from "../pages/Dashboard";
 import { useAuth } from "../contexts/AuthContext";
 import Layout from "../components/Layout";
 import Receitas from "../pages/Receitas";
+import CadastroUsuario from "../pages/CadastroUsuario";
 
 export default function AppRoutes() {
   const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/cadastro" element={<CadastroUsuario />} />
 
       <Route
           path="/*"
@@ -19,11 +21,11 @@ export default function AppRoutes() {
               <Routes>
                 <Route
                   path="/dashboard"
-                  element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />}
+                  element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
                 />
                 <Route 
                   path="/receitas" 
-                  element={isAuthenticated ? <Receitas /> : <Navigate to="/" />}
+                  element={isAuthenticated ? <Receitas /> : <Navigate to="/login" />}
                 />
                 {/* Aqui você pode adicionar outras rotas protegidas */}
               </Routes>
