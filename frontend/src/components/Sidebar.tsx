@@ -1,10 +1,10 @@
-import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiMenu, FiHome, FiUser, FiLogOut } from "react-icons/fi";
+import { FiHome, FiUser, FiLogOut } from "react-icons/fi";
 import { useAuth } from "../contexts/AuthContext";
+import logoGraficoSemFundo from '../assets/logo_grafico_sem_fundo.png';
+import logoNomeSemFundo from '../assets/logo_nome_sem_fundo.png';
 
 export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -14,37 +14,44 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="bg-white h-full transition-all duration-300 border-r border-gray-200 ${collapsed ? 'w-16' : 'w-56'} flex flex-col">
-      <button
-        className="p-4 focus:outline-none !bg-white !border-transparent transition-colors"
-        onClick={() => setCollapsed((prev) => !prev)}
-        aria-label="Alternar sidebar"
-      >
-        <FiMenu size={24} />
-      </button>
+    <aside className="bg-white h-full transition-all duration-300 flex flex-col w-16 sm:w-16 md:w-56">
+      <div className="p-4 flex items-center justify-center">
+        {/* Colapsado: apenas logo, Expandido: nome */}
+        <img
+          src={logoGraficoSemFundo}
+          alt="Logo"
+          className="h-8 w-auto block md:hidden"
+        />
+        <img
+          src={logoNomeSemFundo}
+          alt="NomeLogo"
+          className="h-6 w-auto hidden md:block"
+        />
+      </div>
       <nav className="flex-1">
         <ul className="space-y-2 mt-4">
           <li>
-            <Link to="/dashboard" className="flex items-center px-4 py-2 rounded transition-colors">
+            <Link to="/dashboard" className="flex items-center px-4 py-2 rounded transition-colors justify-center md:justify-start">
               <FiHome size={20} />
-              {!collapsed && <span className="ml-3">Dashboard</span>}
+              <span className="ml-3 hidden md:inline">Dashboard</span>
             </Link>
           </li>
           <li>
-            <Link to="/perfil" className="flex items-center px-4 py-2  rounded transition-colors">
+            <Link to="/perfil" className="flex items-center px-4 py-2 rounded transition-colors justify-center md:justify-start">
               <FiUser size={20} />
-              {!collapsed && <span className="ml-3">Perfil</span>}
+              <span className="ml-3 hidden md:inline">Perfil</span>
             </Link>
           </li>
         </ul>
       </nav>
+      { /* TODO consertar botão sair colapsado */}
       <div className="p-4">
         <button
-          className="flex items-center w-full rounded px-2 py-2 transition-colors text-white"
+          className="flex items-center justify-center md:justify-start w-full rounded px-2 py-2 transition-colors bg-[#234557] text-white"
           onClick={handleLogout}
         >
-          <FiLogOut size={20} className="text-white" />
-          {!collapsed && <span className="ml-3">Sair</span>}
+          <FiLogOut size={20} className="text-white block" />
+          <span className="ml-3 hidden md:inline">Sair</span>
         </button>
       </div>
     </aside>
