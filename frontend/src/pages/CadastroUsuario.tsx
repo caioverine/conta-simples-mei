@@ -1,14 +1,14 @@
 import axios from "axios";
 import { useState } from "react";
 import { Link } from 'react-router-dom';
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function CadastroUsuario() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [senhaConfirmada, setSenhaConfirmada] = useState("");
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleCadastro = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +24,7 @@ export default function CadastroUsuario() {
       console.log(response.data);
       alert("Usuário cadastrado com sucesso!");
 
-      // navigate("/login");
+      navigate("/login");
     } catch (err) {
       console.log(err);
       alert("Erro ao cadastrar");
@@ -49,12 +49,12 @@ export default function CadastroUsuario() {
                 />
               </div>
 
-              <div>
+              <div className="mt-6">
                 <input
                   type="email"
                   name="email"
                   id="email"
-                  placeholder="usuario@mail.com"
+                  placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
