@@ -5,14 +5,12 @@ import { useAuth } from "../contexts/AuthContext";
 import Layout from "../components/Layout";
 import Receitas from "../pages/Receitas";
 import CadastroUsuario from "../pages/CadastroUsuario";
-import Navbar from "../components/Navbar";
 
 export default function AppRoutes() {
   const { isAuthenticated } = useAuth();
 
   return (
     <>
-      <Navbar />
       <Routes>
         <Route path="/login" element={
           <Login />
