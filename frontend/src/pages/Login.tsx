@@ -29,45 +29,60 @@ export default function Login() {
     };
 
     return (
-    <>
-      
-      <div className="flex justify-center min-h-screen px-4">
-        <div className="w-full max-w-xl p-8">
-          <div className="flex-1">
-            <div className="mt-8">
-              <form onSubmit={handleLogin}>
-                <div>
-                  <label className="block mb-2 text-sm text-gray-600 dark:text-gray-200">Email</label>
-                  <input type="email" name="email" id="email" placeholder="usuario@mail.com" value={email} onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" />
-                </div>
-
-                <div className="mt-6">
-                  <div className="flex justify-between mb-2">
-                    <label className="text-sm text-gray-600 dark:text-gray-200">Senha</label>
-                    <a href="#" className="text-sm text-gray-400 focus:text-blue-500 hover:text-blue-500 hover:underline">Esqueci a senha</a>
+      <>
+        <div className="flex flex-col justify-center items-center min-h-screen px-2 sm:px-4 bg-white dark:bg-gray-900">
+          <div className="w-full max-w-md sm:max-w-lg md:max-w-xl p-6 sm:p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            <div className="flex-1">
+              <div className="mt-4 sm:mt-8">
+                <form onSubmit={handleLogin}>
+                  <div>
+                    <label className="block mb-2 text-sm text-gray-600 dark:text-gray-200">Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      id="email"
+                      placeholder="usuario@mail.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+                    />
                   </div>
 
-                  <input type="password" name="password" id="password" placeholder="Sua senha" value={senha} onChange={(e) => setSenha(e.target.value)}
-                    className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" />
-                </div>
+                  <div className="mt-6">
+                    <div className="flex justify-between mb-2">
+                      <label className="text-sm text-gray-600 dark:text-gray-200">Senha</label>
+                      <a href="#" className="text-sm text-gray-400 focus:text-blue-500 hover:text-blue-500 hover:underline">Esqueci a senha</a>
+                    </div>
 
-                <div className="mt-6">
-                  <button type="submit" 
-                    className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-300 transform rounded-lg focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
-                    Entrar
-                  </button>
-                </div>
+                    <input
+                      type="password"
+                      name="password"
+                      id="password"
+                      placeholder="Sua senha"
+                      value={senha}
+                      onChange={(e) => setSenha(e.target.value)}
+                      className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+                    />
+                  </div>
 
-              </form>
+                  <div className="mt-6">
+                    <button
+                      type="submit"
+                      className="w-full px-4 py-2 tracking-wide text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 transform rounded-lg focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50"
+                    >
+                      Entrar
+                    </button>
+                  </div>
+                </form>
 
-              <p className="mt-6 text-sm text-center text-gray-400">Ainda não tem conta? 
-              <Link to="/cadastro" className="text-blue-500 focus:outline-none focus:underline hover:underline"> Cadastre-se</Link>.
-              </p>
+                <p className="mt-6 text-sm text-center text-gray-400">
+                  Ainda não tem conta?
+                  <Link to="/cadastro" className="text-blue-500 focus:outline-none focus:underline hover:underline"> Cadastre-se</Link>.
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
 }
