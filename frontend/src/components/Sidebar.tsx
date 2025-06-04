@@ -44,13 +44,13 @@ export default function Sidebar() {
           </li>
         </ul>
       </nav>
-      { /* TODO consertar botão sair colapsado */}
       <div className="p-4">
         <button
-          className="flex items-center justify-center md:justify-start w-full rounded px-2 py-2 transition-colors bg-[#234557] text-white"
+          className="sidebar-logout-btn flex items-center justify-center md:justify-start w-8 h-8 md:w-full md:h-auto rounded transition-colors bg-[#234557] text-white md:px-2 md:py-2"
           onClick={handleLogout}
+          title="Sair"
         >
-          <FiLogOut size={20} className="text-white block" />
+          <FiLogOut size={24} className="text-white" />
           <span className="ml-3 hidden md:inline">Sair</span>
         </button>
       </div>

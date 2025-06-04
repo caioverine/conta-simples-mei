@@ -67,3 +67,9 @@ button:focus-visible {
     background-color: #234557;
   }
 }
+
+@media (max-width: 767px) {
+  .sidebar-logout-btn {
+    padding: 0 !important;
+  }
+}
