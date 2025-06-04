@@ -11,7 +11,7 @@ export default function Layout({ children }: LayoutProps) {
     <section className="bg-white dark:bg-gray-900">
       <div className="flex h-screen">
         <Sidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col bg-gray-100">
             <main >{children}</main>
         </div>
       </div>
