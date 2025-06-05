@@ -33,37 +33,40 @@ const Receitas = () => {
       <Navbar titulo="Receitas" />
       <div className="min-h-screen bg-gray-100">
         <div className="container mx-auto px-4 py-8">
-          {/* Filtros e botão */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 bg-white rounded">
-            <div className="flex gap-2 flex-wrap">
-              <select
-                className="rounded border-gray-300 px-3 py-2 text-sm"
-                value={filtroMes}
-                onChange={e => setFiltroMes(e.target.value)}
-              >
-                {meses.map(m => (
-                  <option key={m.value} value={m.value}>{m.label}</option>
-                ))}
-              </select>
-              <select
-                className="rounded border-gray-300 px-3 py-2 text-sm"
-                value={filtroCategoria}
-                onChange={e => setFiltroCategoria(e.target.value)}
-              >
-                {categorias.map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            </div>
-            <button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-medium text-sm">
-              <FaPlus /> Nova receita
-            </button>
-          </div>
-
-          {/* Tabela de receitas */}
-          <div className="overflow-x-auto bg-white rounded">
+          <div className="overflow-x-auto bg-white rounded-lg pt-2 pb-2 shadow-sm">
             <table className="min-w-full border-separate border-spacing-y-2">
               <thead>
+                {/* Linha de filtros + botão */}
+                <tr>
+                  <th colSpan={5} className="pb-2 px-3 bg-gray-50 rounded-t-lg">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                      <div className="flex gap-2 flex-wrap">
+                        <select
+                          className="rounded border-gray-300 px-3 py-2 text-sm"
+                          value={filtroMes}
+                          onChange={e => setFiltroMes(e.target.value)}
+                        >
+                          {meses.map(m => (
+                            <option key={m.value} value={m.value}>{m.label}</option>
+                          ))}
+                        </select>
+                        <select
+                          className="rounded border-gray-300 px-3 py-2 text-sm"
+                          value={filtroCategoria}
+                          onChange={e => setFiltroCategoria(e.target.value)}
+                        >
+                          {categorias.map(c => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-medium text-sm">
+                        <FaPlus /> 
+                      </button>
+                    </div>
+                  </th>
+                </tr>
+                {/* Cabeçalho da tabela */}
                 <tr>
                   <th className="pb-2 px-3 text-gray-500 font-semibold bg-gray-50 rounded-l-lg text-center">Data</th>
                   <th className="pb-2 px-3 text-gray-500 font-semibold bg-gray-50 text-center">Categoria</th>
