@@ -1,5 +1,5 @@
 import { Card } from "react-bootstrap";
-import { FaWallet, FaArrowDown, FaArrowUp, FaChartLine } from "react-icons/fa";
+import { FaWallet, FaArrowDown, FaChartLine, FaDollarSign } from "react-icons/fa";
 
 export default function DashboardCards() {
   return (
@@ -13,14 +13,14 @@ export default function DashboardCards() {
       </Card>
       <Card className="text-center shadow-sm bg-white rounded">
         <Card.Body>
-          <FaArrowDown className="mx-auto mt-2 mb-2 text-2xl text-green-600" />
+          <FaDollarSign className="mx-auto mt-2 mb-2 text-2xl text-green-600" />
           <Card.Title className="text-sm text-gray-500">Receitas</Card.Title>
           <div className="text-xl font-bold text-green-600">R$ 2.000,00</div>
         </Card.Body>
       </Card>
       <Card className="text-center shadow-sm bg-white rounded">
         <Card.Body>
-          <FaArrowUp className="mx-auto mt-2 mb-2 text-2xl text-red-600" />
+          <FaArrowDown className="mx-auto mt-2 mb-2 text-2xl text-red-600" />
           <Card.Title className="text-sm text-gray-500">Despesas</Card.Title>
           <div className="text-xl font-bold text-red-600">R$ 800,00</div>
         </Card.Body>

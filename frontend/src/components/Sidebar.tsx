@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { FiHome, FiUser, FiLogOut } from "react-icons/fi";
+import { FaHome, FaSignOutAlt, FaDollarSign, FaArrowDown } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import logoGraficoSemFundo from '../assets/logo_grafico_sem_fundo.png';
 import logoNomeSemFundo from '../assets/logo_nome_sem_fundo.png';
@@ -41,13 +41,13 @@ export default function Sidebar() {
                 }`
               }
             >
-              <FiHome size={20} />
+              <FaHome size={20} />
               <span className="ml-3 hidden md:inline">Dashboard</span>
             </NavLink>
           </li>
           <li>
             <NavLink
-              to="/perfil"
+              to="/receitas"
               className={({ isActive }) =>
                 `flex items-center px-4 py-2 rounded transition-colors justify-center md:justify-start ${
                   isActive
@@ -56,8 +56,23 @@ export default function Sidebar() {
                 }`
               }
             >
-              <FiUser size={20} />
-              <span className="ml-3 hidden md:inline">Perfil</span>
+              <FaDollarSign size={20} />
+              <span className="ml-3 hidden md:inline">Receitas</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/despesas"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 rounded transition-colors justify-center md:justify-start ${
+                  isActive
+                    ? "bg-[#234557] !text-white"
+                    : "text-[#234557] hover:bg-gray-100"
+                }`
+              }
+            >
+              <FaArrowDown size={20} />
+              <span className="ml-3 hidden md:inline">Despesas</span>
             </NavLink>
           </li>
         </ul>
@@ -68,7 +83,7 @@ export default function Sidebar() {
           onClick={handleLogout}
           title="Sair"
         >
-          <FiLogOut size={24} className="text-white" />
+          <FaSignOutAlt size={24} className="text-white" />
           <span className="ml-3 hidden md:inline">Sair</span>
         </button>
       </div>
