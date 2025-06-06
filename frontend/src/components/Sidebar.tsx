@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaHome, FaSignOutAlt, FaDollarSign, FaArrowDown } from "react-icons/fa";
+import { FaHome, FaSignOutAlt, FaDollarSign, FaArrowDown, FaTags } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import logoGraficoSemFundo from '../assets/logo_grafico_sem_fundo.png';
 import logoNomeSemFundo from '../assets/logo_nome_sem_fundo.png';
@@ -73,6 +73,21 @@ export default function Sidebar() {
             >
               <FaArrowDown size={20} />
               <span className="ml-3 hidden md:inline">Despesas</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/categorias"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 rounded transition-colors justify-center md:justify-start ${
+                  isActive
+                    ? "bg-[#234557] !text-white"
+                    : "text-[#234557] hover:bg-gray-100"
+                }`
+              }
+            >
+              <FaTags size={20} />
+              <span className="ml-3 hidden md:inline">Categorias</span>
             </NavLink>
           </li>
         </ul>

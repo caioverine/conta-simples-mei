@@ -6,6 +6,7 @@ import Layout from "../components/Layout";
 import Receitas from "../pages/Receitas/Receitas";
 import CadastroUsuario from "../pages/CadastroUsuario";
 import Despesas from "../pages/Despesas/Despesas";
+import Categorias from "../pages/Categorias/Categorias";
 
 export default function AppRoutes() {
   const { isAuthenticated } = useAuth();
@@ -35,6 +36,10 @@ export default function AppRoutes() {
                   <Route 
                     path="/despesas" 
                     element={isAuthenticated ? <Despesas /> : <Navigate to="/login" />}
+                  />
+                  <Route 
+                    path="/categorias" 
+                    element={isAuthenticated ? <Categorias /> : <Navigate to="/login" />}
                   />
                 </Routes>
               </Layout>
