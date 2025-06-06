@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import Layout from "../components/Layout";
 import Receitas from "../pages/Receitas/Receitas";
 import CadastroUsuario from "../pages/CadastroUsuario";
+import Despesas from "../pages/Despesas/Despesas";
 
 export default function AppRoutes() {
   const { isAuthenticated } = useAuth();
@@ -31,7 +32,10 @@ export default function AppRoutes() {
                     path="/receitas" 
                     element={isAuthenticated ? <Receitas /> : <Navigate to="/login" />}
                   />
-                  {/* Aqui você pode adicionar outras rotas protegidas */}
+                  <Route 
+                    path="/despesas" 
+                    element={isAuthenticated ? <Despesas /> : <Navigate to="/login" />}
+                  />
                 </Routes>
               </Layout>
             }
