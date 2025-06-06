@@ -1,7 +1,7 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 interface SaldoAcumuladoChartProps {
-  data: { mes: string; Saldo: number }[];
+  data: { mes: string; saldo: number }[];
 }
 
 export default function SaldoAcumuladoChart({ data }: SaldoAcumuladoChartProps) {
@@ -14,7 +14,7 @@ export default function SaldoAcumuladoChart({ data }: SaldoAcumuladoChartProps) 
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="Saldo" stroke="#234557" strokeWidth={2} />
+          <Line type="monotone" dataKey="saldo" stroke="#234557" strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
     </div>

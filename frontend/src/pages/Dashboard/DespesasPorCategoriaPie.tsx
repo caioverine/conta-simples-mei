@@ -1,8 +1,8 @@
 import { ResponsiveContainer, Legend, PieChart, Pie, Cell, Tooltip } from "recharts";
 
 interface PieData {
-  name: string;
-  value: number;
+  categoria: string;
+  valor: number;
 }
 
 interface DespesasPorCategoriaPieProps {
@@ -20,8 +20,8 @@ export default function DespesasPorCategoriaPie({ data, colors = DEFAULT_COLORS 
         <PieChart>
           <Pie
             data={data}
-            dataKey="value"
-            nameKey="name"
+            dataKey="valor"
+            nameKey="categoria"
             cx="50%"
             cy="50%"
             outerRadius={80}
