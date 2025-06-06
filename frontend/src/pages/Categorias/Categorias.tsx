@@ -74,16 +74,22 @@ const Categorias = () => {
                     </td>
                     <td className="py-2 px-3 rounded-r-lg flex justify-center gap-2">
                       <button
-                        className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600"
+                        className="!p-0 rounded-full text-[#234557] hover:text-[#2B9669] transition-colors border-none focus:outline-none"
                         title="Editar"
+                        aria-label="Editar"
+                        type="button"
+                        style={{ background: "transparent", border: "none" }}
                       >
-                        <FaEdit size={14} />
+                        <FaEdit size={20} />
                       </button>
                       <button
-                        className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600"
+                        className="!p-0 rounded-full text-[#234557] hover:text-[#2B9669] transition-colors border-none focus:outline-none"
                         title="Excluir"
+                        aria-label="Excluir"
+                        type="button"
+                        style={{ background: "transparent", border: "none" }}
                       >
-                        <FaTrash size={14} />
+                        <FaTrash size={20} />
                       </button>
                     </td>
                   </tr>

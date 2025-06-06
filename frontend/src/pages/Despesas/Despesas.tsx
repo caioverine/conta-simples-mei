@@ -91,11 +91,23 @@ const Despesas = () => {
                     <td className="py-2 px-3 text-center">{d.descricao}</td>
                     <td className="py-2 px-3 font-semibold text-red-600 text-center">R$ {d.valor.toFixed(2)}</td>
                     <td className="py-2 px-3 rounded-r-lg flex justify-center gap-2">
-                      <button className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600" title="Editar">
-                        <FaEdit size={14} />
+                      <button
+                        className="!p-0 rounded-full text-[#234557] hover:text-[#2B9669] transition-colors border-none focus:outline-none"
+                        title="Editar"
+                        aria-label="Editar"
+                        type="button"
+                        style={{ background: "transparent", border: "none" }}
+                      >
+                        <FaEdit size={20} />
                       </button>
-                      <button className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600" title="Excluir">
-                        <FaTrash size={14} />
+                      <button
+                        className="!p-0 rounded-full text-[#234557] hover:text-[#2B9669] transition-colors border-none focus:outline-none"
+                        title="Excluir"
+                        aria-label="Excluir"
+                        type="button"
+                        style={{ background: "transparent", border: "none" }}
+                      >
+                        <FaTrash size={20} />
                       </button>
                     </td>
                   </tr>
