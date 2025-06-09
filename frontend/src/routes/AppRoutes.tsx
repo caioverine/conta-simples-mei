@@ -9,7 +9,11 @@ import Despesas from "../pages/Despesas/Despesas";
 import Categorias from "../pages/Categorias/Categorias";
 
 export default function AppRoutes() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loadingAuth } = useAuth();
+
+  if (loadingAuth) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <>
