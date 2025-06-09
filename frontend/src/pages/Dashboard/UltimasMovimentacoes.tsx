@@ -19,7 +19,7 @@ export default function UltimasMovimentacoes({ movimentacoes }: UltimasMovimenta
         <h3 className="text-lg font-semibold text-[#234557]">Últimas movimentações</h3>
         <div className="flex gap-2">
           <button
-            className="p-2 rounded-full bg-green-600 text-white hover:bg-green-700 flex items-center justify-center"
+            className="btn-icn flex items-center justify-center"
             title="Adicionar movimentação"
           >
             <FaPlus />

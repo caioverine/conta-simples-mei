@@ -60,7 +60,7 @@ const Despesas = () => {
                           ))}
                         </select>
                       </div>
-                      <button className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-medium text-sm">
+                      <button className="btn-icn flex items-center gap-2">
                         <FaPlus />
                       </button>
                     </div>
@@ -92,7 +92,7 @@ const Despesas = () => {
                     <td className="py-2 px-3 font-semibold text-red-600 text-center">R$ {d.valor.toFixed(2)}</td>
                     <td className="py-2 px-3 rounded-r-lg flex justify-center gap-2">
                       <button
-                        className="!p-0 rounded-full text-[#234557] hover:text-[#2B9669] transition-colors border-none focus:outline-none"
+                        className="btn-icn-wt transition-colors"
                         title="Editar"
                         aria-label="Editar"
                         type="button"
@@ -101,7 +101,7 @@ const Despesas = () => {
                         <FaEdit size={20} />
                       </button>
                       <button
-                        className="!p-0 rounded-full text-[#234557] hover:text-[#2B9669] transition-colors border-none focus:outline-none"
+                        className="btn-icn-wt transition-colors"
                         title="Excluir"
                         aria-label="Excluir"
                         type="button"
