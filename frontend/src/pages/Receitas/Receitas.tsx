@@ -1,15 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import { format } from "date-fns";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-
-// Mock de receitas
-const mockReceitas = [
-  { data: "2025-06-01", categoria: "Serviços", descricao: "Consultoria", valor: 1500 },
-  { data: "2025-06-10", categoria: "Produtos", descricao: "Venda de produto", valor: 800 },
-  { data: "2025-05-15", categoria: "Serviços", descricao: "Aula particular", valor: 600 },
-  { data: "2025-05-20", categoria: "Outros", descricao: "Reembolso", valor: 200 },
-];
+import { FaPlus, FaEdit, FaTrash, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { listarReceitas } from "../../services/receita-service";
+import type { Receita } from "../../model/receita-model";
 
 const categorias = ["Todos", "Serviços", "Produtos", "Outros"];
 
@@ -21,8 +15,29 @@ const meses = [
 const Receitas = () => {
   const [filtroMes, setFiltroMes] = useState("2025-06");
   const [filtroCategoria, setFiltroCategoria] = useState("Todos");
+  const [receitas, setReceitas] = useState<Receita[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const receitasFiltradas = mockReceitas.filter((r) => {
+  // Paginação (exemplo)
+  const [page, setPage] = useState(0);
+  const [size] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    async function fetchReceitas() {
+      setLoading(true);
+      try {
+        const resp = await listarReceitas(page, size);
+        setReceitas(resp.data.content);
+        setTotalPages(resp.data.totalPages);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchReceitas();
+  }, [page, size]);
+
+  const receitasFiltradas = receitas.filter((r) => {
     const mes = r.data.slice(0, 7);
     const categoriaOk = filtroCategoria === "Todos" || r.categoria === filtroCategoria;
     return mes === filtroMes && categoriaOk;
@@ -60,7 +75,7 @@ const Receitas = () => {
                           ))}
                         </select>
                       </div>
-                      <button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-medium text-sm">
+                      <button className="btn-icn flex items-center gap-2 font-medium">
                         <FaPlus /> 
                       </button>
                     </div>
@@ -76,44 +91,88 @@ const Receitas = () => {
                 </tr>
               </thead>
               <tbody>
-                {receitasFiltradas.length === 0 && (
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="text-center py-4 text-gray-400">Carregando...</td>
+                  </tr>
+                ) : receitasFiltradas.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="text-center py-4 text-gray-400">Nenhuma receita encontrada.</td>
                   </tr>
+                ) : (
+                  receitasFiltradas.map((r) => (
+                    <tr
+                      key={r.id}
+                      className="bg-gray-50 hover:bg-gray-100 transition rounded-lg shadow-sm"
+                    >
+                      <td className="py-2 px-3 rounded-l-lg font-mono text-sm text-center">{format(new Date(r.data), "dd/MM/yyyy")}</td>
+                      <td className="py-2 px-3 text-center">{r.categoria}</td>
+                      <td className="py-2 px-3 text-center">{r.descricao}</td>
+                      <td className="py-2 px-3 font-semibold text-green-600 text-center">R$ {r.valor.toFixed(2)}</td>
+                      <td className="py-2 px-3 rounded-r-lg flex justify-center gap-2">
+                        <button
+                          className="btn-icn-wt transition-colors"
+                          title="Editar"
+                          aria-label="Editar"
+                          style={{ border: "none" }}
+                        >
+                          <FaEdit size={20} />
+                        </button>
+                        <button
+                          className="btn-icn-wt transition-colors"
+                          title="Excluir"
+                          aria-label="Excluir"
+                          style={{ border: "none" }}
+                        >
+                          <FaTrash size={20} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
                 )}
-                {receitasFiltradas.map((r, idx) => (
-                  <tr
-                    key={idx}
-                    className="bg-gray-50 hover:bg-gray-100 transition rounded-lg shadow-sm"
-                  >
-                    <td className="py-2 px-3 rounded-l-lg font-mono text-sm text-center">{format(new Date(r.data), "dd/MM/yyyy")}</td>
-                    <td className="py-2 px-3 text-center">{r.categoria}</td>
-                    <td className="py-2 px-3 text-center">{r.descricao}</td>
-                    <td className="py-2 px-3 font-semibold text-green-600 text-center">R$ {r.valor.toFixed(2)}</td>
-                    <td className="py-2 px-3 rounded-r-lg flex justify-center gap-2">
-                      <button
-                        className="!p-0 rounded-full text-[#234557] hover:text-[#2B9669] transition-colors border-none focus:outline-none"
-                        title="Editar"
-                        aria-label="Editar"
-                        type="button"
-                        style={{ background: "transparent", border: "none" }}
-                      >
-                        <FaEdit size={20} />
-                      </button>
-                      <button
-                        className="!p-0 rounded-full text-[#234557] hover:text-[#2B9669] transition-colors border-none focus:outline-none"
-                        title="Excluir"
-                        aria-label="Excluir"
-                        type="button"
-                        style={{ background: "transparent", border: "none" }}
-                      >
-                        <FaTrash size={20} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
               </tbody>
             </table>
+            <div className="flex justify-center">
+              <nav
+                className="inline-flex shadow-sm rounded-full border border-gray-300 bg-white p-1"
+                aria-label="Paginação"
+              >
+                <button
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 0}
+                  className={`px-2 py-1 text-sm flex items-center justify-center bg-white text-gray-500 hover:bg-gray-100 transition rounded-full
+                    ${page === 0 ? "opacity-50 cursor-not-allowed" : ""}
+                  `}
+                  style={{ border: "none" }}
+                  aria-label="Página anterior"
+                >
+                  <FaChevronLeft />
+                </button>
+                {[...Array(totalPages)].map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setPage(idx)}
+                    className={`mx-1 px-2 py-1 text-sm bg-white text-gray-700 hover:bg-gray-100 transition rounded-full
+                      ${idx === page ? "!bg-[#234557] text-white" : ""}
+                    `}
+                    style={{ border: "none" }}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setPage(page + 1)}
+                  disabled={page + 1 >= totalPages}
+                  className={`px-2 py-1 text-sm flex items-center justify-center bg-white text-gray-500 hover:bg-gray-100 transition rounded-full
+                    ${page + 1 >= totalPages ? "opacity-50 cursor-not-allowed" : ""}
+                  `}
+                  style={{ border: "none" }}
+                  aria-label="Próxima página"
+                >
+                  <FaChevronRight />
+                </button>
+              </nav>
+            </div>
           </div>
         </div>
       </div>

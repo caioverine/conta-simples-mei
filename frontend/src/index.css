@@ -37,6 +37,10 @@ h1 {
 }
 
 button {
+  cursor: pointer;
+}
+
+.btn {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -46,10 +50,62 @@ button {
   background-color: #234557;
   cursor: pointer;
   transition: border-color 0.25s;
+  color: white;
 }
-button:hover {
-  border-color: #2B9669;
+.btn:hover {
+  border-color: white;
 }
+
+.btn-icn {
+  border-radius: calc(infinity * 1px);
+  border: 1px solid transparent;
+  padding: calc(var(--spacing) * 2);
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #234557;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  color: white;
+}
+.btn-icn:hover {
+  border-color: white;
+}
+
+.btn-wt {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  color: #234557;
+}
+.btn-wt:hover {
+  border-color: #234557;
+  color: #2B9669;
+}
+
+.btn-icn-wt {
+  border-radius: calc(infinity * 1px);
+  border: 1px solid transparent;
+  padding: calc(var(--spacing) * 2);
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  color: #234557;
+}
+.btn-icn-wt:hover {
+  border-color: #234557;
+  color: #2B9669;
+}
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -63,8 +119,11 @@ button:focus-visible {
   a:hover {
     color: #2B9669;
   }
-  button {
+  .btn {
     background-color: #234557;
+  }
+  .btn-wt {
+    background-color: white;
   }
 }
 
