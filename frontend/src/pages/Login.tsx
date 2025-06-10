@@ -51,7 +51,7 @@ export default function Login() {
                   <div className="mt-6">
                     <div className="flex justify-between mb-2">
                       <label className="text-sm text-gray-600 dark:text-gray-200">Senha</label>
-                      <a href="#" className="text-sm text-gray-400 focus:text-blue-500 hover:text-blue-500 hover:underline">Esqueci a senha</a>
+                      <a href="#" className="hover:underline">Esqueci a senha</a>
                     </div>
 
                     <input
@@ -68,7 +68,7 @@ export default function Login() {
                   <div className="mt-6">
                     <button
                       type="submit"
-                      className="w-full px-4 py-2 tracking-wide text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 transform rounded-lg focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50"
+                      className="btn w-full px-4 py-2 tracking-wide"
                     >
                       Entrar
                     </button>
@@ -77,7 +77,7 @@ export default function Login() {
 
                 <p className="mt-6 text-sm text-center text-gray-400">
                   Ainda não tem conta?
-                  <Link to="/cadastro" className="text-blue-500 focus:outline-none focus:underline hover:underline"> Cadastre-se</Link>.
+                  <Link to="/cadastro" className="focus:outline-none focus:underline hover:underline"> Cadastre-se</Link>.
                 </p>
               </div>
             </div>

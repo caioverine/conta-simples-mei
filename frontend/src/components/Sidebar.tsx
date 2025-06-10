@@ -14,9 +14,8 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="bg-white h-full transition-all duration-300 flex flex-col w-16 sm:w-16 md:w-56">
+    <aside className="bg-white dark:bg-gray-900 h-full transition-all duration-300 flex flex-col w-16 sm:w-16 md:w-56">
       <div className="p-4 flex items-center justify-center">
-        {/* Colapsado: apenas logo, Expandido: nome */}
         <img
           src={logoGraficoSemFundo}
           alt="Logo"
@@ -37,7 +36,7 @@ export default function Sidebar() {
                 `flex items-center px-4 py-2 rounded transition-colors justify-center md:justify-start ${
                   isActive
                     ? "bg-[#234557] !text-white"
-                    : "text-[#234557] hover:bg-gray-100"
+                    : "text-[#234557] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`
               }
             >
@@ -52,7 +51,7 @@ export default function Sidebar() {
                 `flex items-center px-4 py-2 rounded transition-colors justify-center md:justify-start ${
                   isActive
                     ? "bg-[#234557] !text-white"
-                    : "text-[#234557] hover:bg-gray-100"
+                    : "text-[#234557] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`
               }
             >
@@ -67,7 +66,7 @@ export default function Sidebar() {
                 `flex items-center px-4 py-2 rounded transition-colors justify-center md:justify-start ${
                   isActive
                     ? "bg-[#234557] !text-white"
-                    : "text-[#234557] hover:bg-gray-100"
+                    : "text-[#234557] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`
               }
             >
@@ -82,7 +81,7 @@ export default function Sidebar() {
                 `flex items-center px-4 py-2 rounded transition-colors justify-center md:justify-start ${
                   isActive
                     ? "bg-[#234557] !text-white"
-                    : "text-[#234557] hover:bg-gray-100"
+                    : "text-[#234557] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`
               }
             >
@@ -94,11 +93,11 @@ export default function Sidebar() {
       </nav>
       <div className="p-0 flex">
         <button
-          className="sidebar-logout-btn flex items-center justify-center md:justify-start w-full h-8 md:h-auto rounded transition-colors bg-[#234557] text-white md:px-2 md:py-2"
+          className="sidebar-logout-btn flex items-center justify-center md:justify-start w-full h-8 md:h-auto rounded transition-colors bg-[#234557] text-white md:px-2 md:py-2 dark:bg-gray-800 dark:text-gray-200"
           onClick={handleLogout}
           title="Sair"
         >
-          <FaSignOutAlt size={24} className="text-white" />
+          <FaSignOutAlt size={24} className="text-white dark:text-gray-200" />
           <span className="ml-3 hidden md:inline">Sair</span>
         </button>
       </div>
