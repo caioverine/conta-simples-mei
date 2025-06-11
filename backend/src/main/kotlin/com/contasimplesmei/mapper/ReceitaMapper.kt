@@ -8,7 +8,7 @@ import java.util.UUID
 fun Receita.toResponseDTO(): ReceitaResponseDTO =
     ReceitaResponseDTO(
         id = this.id!!,
-        categoria = this.categoria,
+        categoria = this.categoria.toResponseDTO(),
         descricao = this.descricao,
         valor = this.valor,
         data = this.data
@@ -17,7 +17,7 @@ fun Receita.toResponseDTO(): ReceitaResponseDTO =
 fun ReceitaRequestDTO.toEntity(): Receita =
     Receita(
         id = null,
-        categoria = this.categoria,
+        categoria = this.categoria.toEntity(),
         descricao = this.descricao,
         valor = this.valor,
         data = this.data

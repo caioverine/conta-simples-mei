@@ -1,11 +1,12 @@
 package com.contasimplesmei.model
 
-import com.contasimplesmei.enums.CategoriaReceitaEnum
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -23,7 +24,7 @@ data class Receita(
     val valor: BigDecimal,
     val data: LocalDate,
 
-    @Enumerated(EnumType.STRING)
-    val categoria: CategoriaReceitaEnum
-
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    val categoria: Categoria
 )

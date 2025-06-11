@@ -23,7 +23,7 @@ class DespesaService(
                 descricao = dto.descricao,
                 valor = dto.valor,
                 data = dto.data,
-                categoria = dto.categoria
+                categoria = dto.categoria.toEntity()
             )
             repository.save(atualizada)
         }.orElse(null)

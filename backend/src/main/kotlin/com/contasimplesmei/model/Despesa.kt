@@ -1,15 +1,9 @@
 package com.contasimplesmei.model
 
-import com.contasimplesmei.enums.CategoriaDespesaEnum
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 @Entity
 @Table(name = "despesas")
@@ -23,6 +17,7 @@ data class Despesa(
     val valor: BigDecimal,
     val data: LocalDate,
 
-    @Enumerated(EnumType.STRING)
-    val categoria: CategoriaDespesaEnum
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    val categoria: Categoria
 )
