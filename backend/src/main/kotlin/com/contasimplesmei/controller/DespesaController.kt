@@ -5,6 +5,7 @@ import com.contasimplesmei.dto.DespesaResponseDTO
 import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.service.DespesaService
 import jakarta.validation.Valid
+import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
@@ -23,8 +25,11 @@ class DespesaController(
     private val service: DespesaService
 ) {
     @GetMapping
-    fun listar(): ResponseEntity<List<DespesaResponseDTO>> {
-        val despesas = service.listarTodas().map { it.toResponseDTO() }
+    fun listarDespesas(
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int
+    ): ResponseEntity<Page<DespesaResponseDTO>> {
+        val despesas = service.listarDespesasPaginadas(page, size)
         return ResponseEntity.ok(despesas)
     }
 
