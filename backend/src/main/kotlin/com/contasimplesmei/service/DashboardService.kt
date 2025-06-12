@@ -4,6 +4,7 @@ import com.contasimplesmei.dto.DashboardResumoDTO
 import com.contasimplesmei.dto.DespesaPorCategoriaDTO
 import com.contasimplesmei.dto.SaldoMensalDTO
 import com.contasimplesmei.dto.UltimaMovimentacaoDTO
+import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.repository.DespesaRepository
 import com.contasimplesmei.repository.ReceitaRepository
 import org.springframework.stereotype.Service
@@ -49,7 +50,7 @@ class DashboardService(
         return despesaRepository.sumGroupByCategoria()
             .map {
                 DespesaPorCategoriaDTO(
-                    categoria = it.categoria,
+                    categoria = it.categoria.toResponseDTO(),
                     valor = it.total
                 )
             }
@@ -62,7 +63,7 @@ class DashboardService(
                     data = it.data,
                     valor = it.valor,
                     descricao = it.descricao,
-                    categoria = it.categoria.toString(),
+                    categoria = it.categoria.nome,
                     tipo = "Receita"
                 )
             }
@@ -73,7 +74,7 @@ class DashboardService(
                     data = it.data,
                     valor = it.valor.negate(),
                     descricao = it.descricao,
-                    categoria = it.categoria.toString(),
+                    categoria = it.categoria.nome,
                     tipo = "Despesa"
                 )
             }
