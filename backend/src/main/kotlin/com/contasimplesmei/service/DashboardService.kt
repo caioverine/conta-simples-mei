@@ -63,7 +63,7 @@ class DashboardService(
                     data = it.data,
                     valor = it.valor,
                     descricao = it.descricao,
-                    categoria = it.categoria.nome,
+                    categoria = it.categoria.nome!!,
                     tipo = "Receita"
                 )
             }
@@ -74,7 +74,7 @@ class DashboardService(
                     data = it.data,
                     valor = it.valor.negate(),
                     descricao = it.descricao,
-                    categoria = it.categoria.nome,
+                    categoria = it.categoria.nome!!,
                     tipo = "Despesa"
                 )
             }

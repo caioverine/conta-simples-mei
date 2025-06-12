@@ -7,8 +7,8 @@ import com.contasimplesmei.model.Categoria
 fun Categoria.toResponseDTO(): CategoriaResponseDTO =
     CategoriaResponseDTO(
         id = this.id!!,
-        nome = this.nome,
-        tipo = this.tipo
+        nome = this.nome!!,
+        tipo = this.tipo!!
     )
 
 fun CategoriaRequestDTO.toEntity(): Categoria =

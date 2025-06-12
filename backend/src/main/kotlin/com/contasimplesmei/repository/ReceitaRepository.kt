@@ -3,7 +3,9 @@ package com.contasimplesmei.repository
 import com.contasimplesmei.model.Receita
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import java.math.BigDecimal
+import java.util.Optional
 import java.util.UUID
 
 interface ReceitaRepository : JpaRepository<Receita, UUID> {
@@ -17,4 +19,7 @@ interface ReceitaRepository : JpaRepository<Receita, UUID> {
     fun sumByMesAtual(): BigDecimal
 
     fun findTop5ByOrderByDataDesc(): List<Receita>
+
+    @Query("SELECT r FROM Receita r JOIN FETCH r.categoria WHERE r.id = :id")
+    fun findByIdWithCategoria(@Param("id") id: UUID): Optional<Receita>
 }

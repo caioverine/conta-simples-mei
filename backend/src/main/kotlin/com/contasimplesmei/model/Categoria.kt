@@ -19,9 +19,9 @@ data class Categoria(
     val id: UUID? = null,
 
     @Column(nullable = false)
-    val nome: String,
+    val nome: String? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val tipo: TipoCategoria
+    val tipo: TipoCategoria? = null
 )
