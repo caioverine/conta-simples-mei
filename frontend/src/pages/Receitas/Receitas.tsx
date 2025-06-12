@@ -40,7 +40,7 @@ const Receitas = () => {
 
   const receitasFiltradas = receitas.filter((r) => {
     const mes = r.data.slice(0, 7);
-    const categoriaOk = filtroCategoria === "Todos" || r.categoria === filtroCategoria;
+    const categoriaOk = filtroCategoria === "Todos" || r.categoria.nome === filtroCategoria;
     return mes === filtroMes && categoriaOk;
   });
 
@@ -107,7 +107,7 @@ const Receitas = () => {
                       className="bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg shadow-sm"
                     >
                       <td className="py-2 px-3 rounded-l-lg font-mono text-sm text-center text-gray-700 dark:text-gray-300">{format(new Date(r.data), "dd/MM/yyyy")}</td>
-                      <td className="py-2 px-3 text-center text-gray-700 dark:text-gray-300">{r.categoria}</td>
+                      <td className="py-2 px-3 text-center text-gray-700 dark:text-gray-300">{r.categoria.nome}</td>
                       <td className="py-2 px-3 text-center text-gray-700 dark:text-gray-300">{r.descricao}</td>
                       <td className="py-2 px-3 font-semibold text-green-600 dark:text-green-400 text-center">R$ {r.valor.toFixed(2)}</td>
                       <td className="py-2 px-3 rounded-r-lg flex justify-center gap-2">

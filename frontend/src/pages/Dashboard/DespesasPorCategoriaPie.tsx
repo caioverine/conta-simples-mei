@@ -21,7 +21,7 @@ export default function DespesasPorCategoriaPie({ data, colors = DEFAULT_COLORS 
           <Pie
             data={data}
             dataKey="valor"
-            nameKey="categoria"
+            nameKey="categoria.nome"
             cx="50%"
             cy="50%"
             outerRadius={80}
