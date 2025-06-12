@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { listarCategoriasReceita } from "../../services/categoria-service";
+import type { Categoria } from "../../model/categoria-model";
 
 interface Props {
   onClose: () => void;
@@ -8,7 +10,7 @@ interface Props {
 export interface ReceitaFormData {
   descricao: string;
   valor: number;
-  categoria: string;
+  idCategoria: string;
   data: string;
 }
 
@@ -16,9 +18,25 @@ const ModalNovaReceita = ({ onClose, onSave }: Props) => {
   const [form, setForm] = useState<ReceitaFormData>({
     descricao: "",
     valor: 0,
-    categoria: "",
+    idCategoria: "",
     data: "",
   });
+
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [loadingCategorias, setLoadingCategorias] = useState(false);
+
+  useEffect(() => {
+    async function fetchCategorias() {
+      setLoadingCategorias(true);
+      try {
+        const resp = await listarCategoriasReceita("RECEITA");
+        setCategorias(resp.data);
+      } finally {
+        setLoadingCategorias(false);
+      }
+    }
+    fetchCategorias();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -55,16 +73,21 @@ const ModalNovaReceita = ({ onClose, onSave }: Props) => {
             required
           />
           <select
-            name="categoria"
-            value={form.categoria}
+            name="idCategoria"
+            value={form.idCategoria}
             onChange={handleChange}
             className="w-full border p-2 rounded"
             required
+            disabled={loadingCategorias}
           >
-            <option value="">Selecione uma categoria</option>
-            <option value="SERVICO">Serviço</option>
-            <option value="PRODUTO">Produto</option>
-            <option value="OUTROS">Outros</option>
+            <option value="">
+              {loadingCategorias ? "Carregando categorias..." : "Selecione uma categoria"}
+            </option>
+            {categorias.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.nome}
+              </option>
+            ))}
           </select>
           <input
             name="data"
@@ -84,7 +107,7 @@ const ModalNovaReceita = ({ onClose, onSave }: Props) => {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700"
+              className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white"
             >
               Salvar
             </button>

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import { format } from "date-fns";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { listarReceitas } from "../../services/receita-service";
+import { listarReceitas, salvarReceita } from "../../services/receita-service";
 import type { Receita } from "../../model/receita-model";
 import Pagination from "../../components/Pagination";
+import ModalNovaReceita, { type ReceitaFormData } from "./ModalNovaReceita";
 
 const categorias = ["Todos", "Serviços", "Produtos", "Outros"];
 
@@ -18,6 +19,7 @@ const Receitas = () => {
   const [filtroCategoria, setFiltroCategoria] = useState("Todos");
   const [receitas, setReceitas] = useState<Receita[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   // Paginação (exemplo)
   const [page, setPage] = useState(0);
@@ -43,6 +45,21 @@ const Receitas = () => {
     const categoriaOk = filtroCategoria === "Todos" || r.categoria.nome === filtroCategoria;
     return mes === filtroMes && categoriaOk;
   });
+
+  // Função para salvar nova receita
+  const handleSaveReceita = async (data: ReceitaFormData) => {
+    setLoading(true);
+    try {
+      await salvarReceita(data);
+      // Recarrega a lista após salvar
+      const resp = await listarReceitas(page, size);
+      setReceitas(resp.data.content);
+      setTotalPages(resp.data.totalPages);
+    } finally {
+      setLoading(false);
+      setShowModal(false);
+    }
+  };
 
   return (
     <>
@@ -76,8 +93,11 @@ const Receitas = () => {
                           ))}
                         </select>
                       </div>
-                      <button className="btn-icn flex items-center gap-2 font-medium">
-                        <FaPlus /> 
+                      <button
+                        className="btn-icn flex items-center gap-2 font-medium"
+                        onClick={() => setShowModal(true)}
+                      >
+                        <FaPlus />
                       </button>
                     </div>
                   </th>
@@ -143,6 +163,12 @@ const Receitas = () => {
           </div>
         </div>
       </div>
+      {showModal && (
+        <ModalNovaReceita
+          onClose={() => setShowModal(false)}
+          onSave={handleSaveReceita}
+        />
+      )}
     </>
   );
 };
