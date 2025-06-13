@@ -6,6 +6,7 @@ import { listarReceitas, salvarReceita } from "../../services/receita-service";
 import type { Receita } from "../../model/receita-model";
 import Pagination from "../../components/Pagination";
 import ModalNovaReceita, { type ReceitaFormData } from "./ModalNovaReceita";
+import { ModalSucesso } from "../../components/ModalSucesso";
 
 const categorias = ["Todos", "Serviços", "Produtos", "Outros"];
 
@@ -20,6 +21,8 @@ const Receitas = () => {
   const [receitas, setReceitas] = useState<Receita[]>([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   // Paginação (exemplo)
   const [page, setPage] = useState(0);
@@ -49,15 +52,20 @@ const Receitas = () => {
   // Função para salvar nova receita
   const handleSaveReceita = async (data: ReceitaFormData) => {
     setLoading(true);
+    setError(null);
     try {
       await salvarReceita(data);
       // Recarrega a lista após salvar
       const resp = await listarReceitas(page, size);
       setReceitas(resp.data.content);
       setTotalPages(resp.data.totalPages);
+      setShowModal(false);
+      setSuccess("Receita cadastrada com sucesso!");
+    } catch (err: unknown) {
+      console.error("Erro ao salvar receita:", err);
+      setError("Erro ao salvar receita. Tente novamente.");
     } finally {
       setLoading(false);
-      setShowModal(false);
     }
   };
 
@@ -165,8 +173,18 @@ const Receitas = () => {
       </div>
       {showModal && (
         <ModalNovaReceita
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+            setShowModal(false);
+            setError(null);
+          }}
           onSave={handleSaveReceita}
+          error={error}
+        />
+      )}
+      {success && (
+        <ModalSucesso
+          mensagem={success}
+          onClose={() => setSuccess(null)}
         />
       )}
     </>
