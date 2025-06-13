@@ -4,13 +4,14 @@ import com.contasimplesmei.dto.DespesaRequestDTO
 import com.contasimplesmei.dto.DespesaResponseDTO
 import com.contasimplesmei.mapper.toEntity
 import com.contasimplesmei.mapper.toResponseDTO
+import com.contasimplesmei.model.Categoria
 import com.contasimplesmei.model.Despesa
 import com.contasimplesmei.repository.DespesaRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 class DespesaService(
@@ -23,7 +24,12 @@ class DespesaService(
 
     fun buscarPorId(id: UUID): Despesa? = repository.findById(id).orElse(null)
 
-    fun criar(dto: DespesaRequestDTO): Despesa = repository.save(dto.toEntity())
+    fun criar(dto: DespesaRequestDTO): Despesa {
+        val despesSalva = repository.save(dto.toEntity())
+        val despesaCompleta = repository.findByIdWithCategoria(despesSalva.id!!)
+            .orElseThrow { IllegalStateException("Despesa não encontrada após o save") }
+        return despesaCompleta
+    }
 
     fun atualizar(id: UUID, dto: DespesaRequestDTO): Despesa? {
         return repository.findById(id).map {
@@ -31,7 +37,7 @@ class DespesaService(
                 descricao = dto.descricao,
                 valor = dto.valor,
                 data = dto.data,
-                categoria = dto.categoria.toEntity()
+                categoria = Categoria(id = dto.idCategoria)
             )
             repository.save(atualizada)
         }.orElse(null)
