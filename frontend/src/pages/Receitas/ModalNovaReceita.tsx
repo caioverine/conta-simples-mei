@@ -30,7 +30,7 @@ const ModalNovaReceita = ({ onClose, onSave, error }: Props) => {
     async function fetchCategorias() {
       setLoadingCategorias(true);
       try {
-        const resp = await listarCategoriasReceita("RECEITA");
+        const resp = await listarCategoriasReceita();
         setCategorias(resp.data);
       } finally {
         setLoadingCategorias(false);
