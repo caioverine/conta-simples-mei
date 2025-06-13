@@ -88,6 +88,7 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
   color: #234557;
+  border-color: #234557;
 }
 .btn-wt:hover {
   border-color: #234557;
