@@ -5,6 +5,6 @@ export const listarCategorias = async () => {
   return api.get<Categoria[]>("/categorias");
 }
 
-export const listarCategoriasReceita = async (tipo: string) => {
-  return api.get<Categoria[]>(`/categorias/tipo/${tipo}`);
+export const listarCategoriasReceita = async () => {
+  return api.get<Categoria[]>(`/categorias/tipo/RECEITA`);
 }
