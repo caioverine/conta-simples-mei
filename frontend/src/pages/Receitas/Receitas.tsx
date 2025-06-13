@@ -29,7 +29,6 @@ const Receitas = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Paginação (exemplo)
   const [page, setPage] = useState(0);
   const [size] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
