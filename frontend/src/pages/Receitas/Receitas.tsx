@@ -3,12 +3,11 @@ import Navbar from "../../components/Navbar";
 import { format } from "date-fns";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { listarReceitas, salvarReceita } from "../../services/receita-service";
+import { listarCategoriasReceita } from "../../services/categoria-service";
 import type { Receita } from "../../model/receita-model";
 import Pagination from "../../components/Pagination";
 import ModalNovaReceita, { type ReceitaFormData } from "./ModalNovaReceita";
 import { ModalSucesso } from "../../components/ModalSucesso";
-
-const categorias = ["Todos", "Serviços", "Produtos", "Outros"];
 
 const meses = [
   { value: "2025-06", label: "Junho/2025" },
@@ -19,6 +18,7 @@ const Receitas = () => {
   const [filtroMes, setFiltroMes] = useState("2025-06");
   const [filtroCategoria, setFiltroCategoria] = useState("Todos");
   const [receitas, setReceitas] = useState<Receita[]>([]);
+  const [categorias, setCategorias] = useState<string[]>(["Todos"]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,12 +36,31 @@ const Receitas = () => {
         const resp = await listarReceitas(page, size);
         setReceitas(resp.data.content);
         setTotalPages(resp.data.totalPages);
+      } catch (err) {
+        console.error("Erro ao carregar receitas:", err);
+        setError("Erro ao carregar receitas. Tente novamente.");
+        setLoading(false);
       } finally {
         setLoading(false);
       }
     }
     fetchReceitas();
   }, [page, size]);
+
+  useEffect(() => {
+    async function fetchCategorias() {
+      try {
+        const resp = await listarCategoriasReceita();
+        // Adiciona "Todos" no início da lista
+        setCategorias(["Todos", ...resp.data.map((cat) => cat.nome)]);
+      } catch (err) {
+        console.error("Erro ao carregar categorias:", err);
+        setError("Erro ao carregar categorias. Tente novamente.");
+        setCategorias(["Todos"]);
+      }
+    }
+    fetchCategorias();
+  }, []);
 
   const receitasFiltradas = receitas.filter((r) => {
     const mes = r.data.slice(0, 7);
