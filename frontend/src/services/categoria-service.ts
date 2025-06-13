@@ -8,3 +8,7 @@ export const listarCategorias = async () => {
 export const listarCategoriasReceita = async () => {
   return api.get<Categoria[]>(`/categorias/tipo/RECEITA`);
 }
+
+export const listarCategoriasDespesa = async () => {
+  return api.get<Categoria[]>(`/categorias/tipo/DESPESA`);
+}

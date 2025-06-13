@@ -1,25 +1,35 @@
 import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
-import { format } from "date-fns";
+import { format, subMonths } from "date-fns";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { listarDespesas } from "../../services/despesa-service";
+import { listarDespesas, salvarDespesa } from "../../services/despesa-service";
 import type { Despesa } from "../../model/despesa-model";
 import Pagination from "../../components/Pagination";
+import { ptBR } from "date-fns/locale";
+import { listarCategoriasDespesa } from "../../services/categoria-service";
+import type { DespesaFormData } from "./ModalNovaDespesa";
+import ModalNovaDespesa from "./ModalNovaDespesa";
+import { ModalSucesso } from "../../components/ModalSucesso";
 
-const categorias = ["Todos", "Serviços", "Produtos", "Outros"];
-
-const meses = [
-  { value: "2025-06", label: "Junho/2025" },
-  { value: "2025-05", label: "Maio/2025" },
-];
+const meses = Array.from({ length: 6 }).map((_, i) => {
+  const date = subMonths(new Date(), i);
+  return {
+    value: format(date, "yyyy-MM"),
+    label: format(date, "MMMM/yyyy", { locale: ptBR })
+      .replace(/^./, (str) => str.toUpperCase()),
+  };
+});
 
 const Despesas = () => {
-  const [filtroMes, setFiltroMes] = useState("2025-06");
+  const [filtroMes, setFiltroMes] = useState(meses[0].value);
   const [filtroCategoria, setFiltroCategoria] = useState("Todos");
   const [despesas, setDespesas] = useState<Despesa[]>([]);
+  const [categorias, setCategorias] = useState<string[]>(["Todos"]);
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  // Paginação
   const [page, setPage] = useState(0);
   const [size] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
@@ -31,6 +41,10 @@ const Despesas = () => {
         const resp = await listarDespesas(page, size);
         setDespesas(resp.data.content);
         setTotalPages(resp.data.totalPages);
+      } catch (err) {
+        console.error("Erro ao carregar despesas:", err);
+        setError("Erro ao carregar despesas. Tente novamente.");
+        setLoading(false);
       } finally {
         setLoading(false);
       }
@@ -38,11 +52,46 @@ const Despesas = () => {
     fetchDespesas();
   }, [page, size]);
 
+  useEffect(() => {
+      async function fetchCategorias() {
+        try {
+          const resp = await listarCategoriasDespesa();
+          // Adiciona "Todos" no início da lista
+          setCategorias(["Todos", ...resp.data.map((cat) => cat.nome)]);
+        } catch (err) {
+          console.error("Erro ao carregar categorias:", err);
+          setError("Erro ao carregar categorias. Tente novamente.");
+          setCategorias(["Todos"]);
+        }
+      }
+      fetchCategorias();
+    }, []);
+
   const despesasFiltradas = despesas.filter((d) => {
     const mes = d.data.slice(0, 7);
     const categoriaOk = filtroCategoria === "Todos" || d.categoria.nome === filtroCategoria;
     return mes === filtroMes && categoriaOk;
   });
+
+  // Função para salvar nova despesa
+    const handleSaveDespesa = async (data: DespesaFormData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        await salvarDespesa(data);
+        // Recarrega a lista após salvar
+        const resp = await listarDespesas(page, size);
+        setDespesas(resp.data.content);
+        setTotalPages(resp.data.totalPages);
+        setShowModal(false);
+        setSuccess("Despesa cadastrada com sucesso!");
+      } catch (err: unknown) {
+        console.error("Erro ao salvar despesa:", err);
+        setError("Erro ao salvar despesa. Tente novamente.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
   return (
     <>
@@ -76,7 +125,9 @@ const Despesas = () => {
                           ))}
                         </select>
                       </div>
-                      <button className="btn-icn flex items-center gap-2 font-medium">
+                      <button className="btn-icn flex items-center gap-2 font-medium"
+                        onClick={() => setShowModal(true)}
+                      >
                         <FaPlus /> 
                       </button>
                     </div>
@@ -143,6 +194,22 @@ const Despesas = () => {
           </div>
         </div>
       </div>
+      {showModal && (
+        <ModalNovaDespesa
+          onClose={() => {
+            setShowModal(false);
+            setError(null);
+          }}
+          onSave={handleSaveDespesa}
+          error={error}
+        />
+      )}
+      {success && (
+        <ModalSucesso
+          mensagem={success}
+          onClose={() => setSuccess(null)}
+        />
+      )}
     </>
   );
 };
