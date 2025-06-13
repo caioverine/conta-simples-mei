@@ -4,8 +4,9 @@ import com.contasimplesmei.dto.CategoriaDespesaGroupProjection
 import com.contasimplesmei.model.Despesa
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import java.math.BigDecimal
-import java.util.UUID
+import java.util.*
 
 interface DespesaRepository : JpaRepository<Despesa, UUID> {
     @Query("SELECT SUM(d.valor) FROM Despesa d")
@@ -21,4 +22,7 @@ interface DespesaRepository : JpaRepository<Despesa, UUID> {
 
     @Query("SELECT d.categoria as categoria, SUM(d.valor) as total FROM Despesa d GROUP BY d.categoria")
     fun sumGroupByCategoria(): List<CategoriaDespesaGroupProjection>
+
+    @Query("SELECT d FROM Despesa d JOIN FETCH d.categoria WHERE d.id = :id")
+    fun findByIdWithCategoria(@Param("id") id: UUID): Optional<Despesa>
 }
