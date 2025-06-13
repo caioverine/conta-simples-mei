@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
-import { format } from "date-fns";
+import { format, subMonths } from "date-fns";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { listarReceitas, salvarReceita } from "../../services/receita-service";
 import { listarCategoriasReceita } from "../../services/categoria-service";
@@ -8,14 +8,19 @@ import type { Receita } from "../../model/receita-model";
 import Pagination from "../../components/Pagination";
 import ModalNovaReceita, { type ReceitaFormData } from "./ModalNovaReceita";
 import { ModalSucesso } from "../../components/ModalSucesso";
+import { ptBR } from "date-fns/locale";
 
-const meses = [
-  { value: "2025-06", label: "Junho/2025" },
-  { value: "2025-05", label: "Maio/2025" },
-];
+const meses = Array.from({ length: 6 }).map((_, i) => {
+  const date = subMonths(new Date(), i);
+  return {
+    value: format(date, "yyyy-MM"),
+    label: format(date, "MMMM/yyyy", { locale: ptBR })
+      .replace(/^./, (str) => str.toUpperCase()),
+  };
+});
 
 const Receitas = () => {
-  const [filtroMes, setFiltroMes] = useState("2025-06");
+  const [filtroMes, setFiltroMes] = useState(meses[0].value);
   const [filtroCategoria, setFiltroCategoria] = useState("Todos");
   const [receitas, setReceitas] = useState<Receita[]>([]);
   const [categorias, setCategorias] = useState<string[]>(["Todos"]);
