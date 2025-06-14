@@ -1,6 +1,5 @@
 package com.contasimplesmei.model
 
-import com.contasimplesmei.enums.TipoCategoria
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -21,7 +20,6 @@ data class Categoria(
     @Column(nullable = false)
     val nome: String? = null,
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val tipo: TipoCategoria? = null
+    val tipo: String? = null
 )

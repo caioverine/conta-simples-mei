@@ -2,7 +2,6 @@ package com.contasimplesmei.service
 
 import com.contasimplesmei.dto.CategoriaRequestDTO
 import com.contasimplesmei.dto.CategoriaResponseDTO
-import com.contasimplesmei.enums.TipoCategoria
 import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.model.Categoria
 import com.contasimplesmei.repository.CategoriaRepository
@@ -18,7 +17,7 @@ class CategoriaService(
 
     fun listarPorTipo(tipo: String): List<CategoriaResponseDTO> {
         val tipoCategoria = runCatching {
-            TipoCategoria.valueOf(tipo.uppercase())
+            tipo.uppercase()
         }.getOrElse {
             throw IllegalArgumentException("Tipo de categoria inválido: $tipo. Use RECEITA ou DESPESA.")
         }
