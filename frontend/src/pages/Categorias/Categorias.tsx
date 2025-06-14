@@ -1,13 +1,18 @@
 import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { listarCategorias } from "../../services/categoria-service";
+import { listarCategorias, salvarCategoria } from "../../services/categoria-service";
 import type { Categoria } from "../../model/categoria-model";
+import ModalNovaCategoria, { type CategoriaFormData } from "./ModalNovaCategoria";
+import { ModalSucesso } from "../../components/ModalSucesso";
 
 const Categorias = () => {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [filtroNome, setFiltroNome] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchCategorias() {
@@ -25,6 +30,23 @@ const Categorias = () => {
   const categoriasFiltradas = categorias.filter((cat) =>
     cat.nome.toLowerCase().includes(filtroNome.toLowerCase())
   );
+
+  const handleSaveCategoria = async (data: CategoriaFormData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await salvarCategoria(data);
+      const resp = await listarCategorias();
+      setCategorias(resp.data);
+      setShowModal(false);
+      setSuccess("Categoria salva com sucesso!");
+    } catch (err: unknown) {
+      console.error("Erro ao salvar categoria:", err);
+      setError("Erro ao salvar categoria. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -45,7 +67,8 @@ const Categorias = () => {
                         value={filtroNome}
                         onChange={(e) => setFiltroNome(e.target.value)}
                       />
-                      <button className="btn-icn flex items-center gap-2">
+                      <button className="btn-icn flex items-center gap-2 font-medium"
+                        onClick={() => setShowModal(true)}>
                         <FaPlus />
                       </button>
                     </div>
@@ -117,6 +140,22 @@ const Categorias = () => {
           </div>
         </div>
       </div>
+      {showModal && (
+        <ModalNovaCategoria
+          onClose={() => {
+            setShowModal(false);
+            setError(null);
+          }}
+          onSave={handleSaveCategoria}
+          error={error}
+        />
+      )}
+      {success && (
+        <ModalSucesso
+          mensagem={success}
+          onClose={() => setSuccess(null)}
+        />
+      )}
     </>
   );
 };

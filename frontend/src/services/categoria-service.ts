@@ -1,4 +1,5 @@
 import type { Categoria } from "../model/categoria-model";
+import type { CategoriaFormData } from "../pages/Categorias/ModalNovaCategoria";
 import api from "./api";
 
 export const listarCategorias = async () => {
@@ -11,4 +12,8 @@ export const listarCategoriasReceita = async () => {
 
 export const listarCategoriasDespesa = async () => {
   return api.get<Categoria[]>(`/categorias/tipo/DESPESA`);
+}
+
+export const salvarCategoria = async (dados: CategoriaFormData) => {
+  return api.post<Categoria>("/categorias", dados);
 }
