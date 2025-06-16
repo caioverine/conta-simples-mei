@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import { format, subMonths } from "date-fns";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { atualizarReceita, listarReceitas, salvarReceita } from "../../services/receita-service";
+import { atualizarReceita, excluirReceita, listarReceitas, salvarReceita } from "../../services/receita-service";
 import { listarCategoriasReceita } from "../../services/categoria-service";
 import type { Receita } from "../../model/receita-model";
 import Pagination from "../../components/Pagination";
@@ -105,6 +105,26 @@ const Receitas = () => {
     setShowModal(true);
   };
 
+  const handleDeleteClick = async (receita: Receita) => {
+    if (window.confirm(`Deseja realmente excluir a receita "${receita.descricao}"?`)) {
+      setLoading(true);
+      setError(null);
+      try {
+        await excluirReceita(receita.id);
+        setSuccess("Receita excluída com sucesso!");
+        // Recarrega a lista após excluir
+        const resp = await listarReceitas(page, size);
+        setReceitas(resp.data.content);
+        setTotalPages(resp.data.totalPages);
+      } catch (err: unknown) {
+        console.error("Erro ao excluir receita:", err);
+        setError("Erro ao excluir receita. Tente novamente.");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <>
       <Navbar titulo="Receitas" />
@@ -189,6 +209,7 @@ const Receitas = () => {
                           title="Excluir"
                           aria-label="Excluir"
                           style={{ border: "none" }}
+                          onClick={() => handleDeleteClick(r)}
                         >
                           <FaTrash size={20} />
                         </button>

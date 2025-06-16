@@ -16,3 +16,7 @@ export const salvarReceita = async (dados: ReceitaFormData) => {
 export const atualizarReceita = async (dados: ReceitaFormData) => {
   return api.put<Receita>(`/receitas/${dados.id}`, dados);
 };
+
+export const excluirReceita = async (id: string) => {
+  return api.delete(`/receitas/${id}`);
+}
