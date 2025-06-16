@@ -43,5 +43,13 @@ class DespesaService(
         }.orElse(null)
     }
 
-    fun deletar(id: UUID) = repository.deleteById(id)
+    fun deletar(id: UUID) {
+        val despesa = repository.findById(id)
+            .orElseThrow { IllegalStateException("Despesa não encontrada após o save") }
+
+        if(!despesa.ativo) throw IllegalStateException("Despesa já inativa")
+
+        val despesaInativa = despesa.copy(ativo = false)
+        repository.save(despesaInativa)
+    }
 }

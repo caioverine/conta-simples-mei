@@ -19,5 +19,7 @@ data class Despesa(
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")
-    val categoria: Categoria
+    val categoria: Categoria,
+
+    val ativo: Boolean = true
 )
