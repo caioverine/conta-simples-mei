@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import { format, subMonths } from "date-fns";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { listarReceitas, salvarReceita } from "../../services/receita-service";
+import { atualizarReceita, listarReceitas, salvarReceita } from "../../services/receita-service";
 import { listarCategoriasReceita } from "../../services/categoria-service";
 import type { Receita } from "../../model/receita-model";
 import Pagination from "../../components/Pagination";
@@ -23,6 +23,7 @@ const Receitas = () => {
   const [filtroMes, setFiltroMes] = useState(meses[0].value);
   const [filtroCategoria, setFiltroCategoria] = useState("Todos");
   const [receitas, setReceitas] = useState<Receita[]>([]);
+  const [receitaEditando, setReceitaEditando] = useState<Receita | null>(null);
   const [categorias, setCategorias] = useState<string[]>(["Todos"]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -77,19 +78,31 @@ const Receitas = () => {
     setLoading(true);
     setError(null);
     try {
-      await salvarReceita(data);
+      if (receitaEditando) {
+        await atualizarReceita(data);
+        setSuccess("Receita atualizada com sucesso!");
+      } else {
+        await salvarReceita(data);
+        setSuccess("Receita cadastrada com sucesso!");
+      }
       // Recarrega a lista após salvar
       const resp = await listarReceitas(page, size);
       setReceitas(resp.data.content);
       setTotalPages(resp.data.totalPages);
       setShowModal(false);
-      setSuccess("Receita cadastrada com sucesso!");
+      setReceitaEditando(null);
     } catch (err: unknown) {
+      setReceitaEditando(null);
       console.error("Erro ao salvar receita:", err);
       setError("Erro ao salvar receita. Tente novamente.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditClick = (receita: Receita) => {
+    setReceitaEditando(receita);
+    setShowModal(true);
   };
 
   return (
@@ -167,6 +180,7 @@ const Receitas = () => {
                           title="Editar"
                           aria-label="Editar"
                           style={{ border: "none" }}
+                          onClick={() => handleEditClick(r)}
                         >
                           <FaEdit size={20} />
                         </button>
@@ -199,9 +213,11 @@ const Receitas = () => {
           onClose={() => {
             setShowModal(false);
             setError(null);
+            setReceitaEditando(null);
           }}
           onSave={handleSaveReceita}
           error={error}
+          receita={receitaEditando}
         />
       )}
       {success && (

@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { listarCategoriasReceita } from "../../services/categoria-service";
 import type { Categoria } from "../../model/categoria-model";
+import type { Receita } from "../../model/receita-model";
 
 interface Props {
   onClose: () => void;
   onSave: (data: ReceitaFormData) => void;
   error?: string | null;
+  receita?: Receita | null;
 }
 
 export interface ReceitaFormData {
+  id: string;
   descricao: string;
   valor: number;
   idCategoria: string;
   data: string;
 }
 
-const ModalNovaReceita = ({ onClose, onSave, error }: Props) => {
+const ModalNovaReceita = ({ onClose, onSave, error, receita }: Props) => {
   const [form, setForm] = useState<ReceitaFormData>({
+    id: "",
     descricao: "",
     valor: 0,
     idCategoria: "",
@@ -25,6 +29,27 @@ const ModalNovaReceita = ({ onClose, onSave, error }: Props) => {
 
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loadingCategorias, setLoadingCategorias] = useState(false);
+
+  // Preenche o formulário ao abrir para edição
+  useEffect(() => {
+    if (receita) {
+      setForm({
+        id: receita.id,
+        descricao: receita.descricao,
+        valor: receita.valor,
+        idCategoria: receita.categoria.id,
+        data: receita.data.slice(0, 10), // yyyy-MM-dd
+      });
+    } else {
+      setForm({
+        id: "",
+        descricao: "",
+        valor: 0,
+        idCategoria: "",
+        data: "",
+      });
+    }
+  }, [receita]);
 
   useEffect(() => {
     async function fetchCategorias() {
@@ -52,7 +77,9 @@ const ModalNovaReceita = ({ onClose, onSave, error }: Props) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
-        <h2 className="text-xl font-bold mb-4 text-[#234557] dark:text-gray-100">Nova Receita</h2>
+        <h2 className="text-xl font-bold mb-4 text-[#234557] dark:text-gray-100">
+          {receita ? "Editar Receita" : "Nova Receita"}
+        </h2>
         {error && (
           <div className="mb-2 rounded bg-red-100 border border-red-400 text-red-700 px-3 py-2 text-sm">
             {error}

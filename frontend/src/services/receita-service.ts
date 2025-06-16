@@ -12,3 +12,7 @@ export const listarReceitas = async (page: number, size: number) => {
 export const salvarReceita = async (dados: ReceitaFormData) => {
   return api.post<Receita>("/receitas", dados);
 };
+
+export const atualizarReceita = async (dados: ReceitaFormData) => {
+  return api.put<Receita>(`/receitas/${dados.id}`, dados);
+};
