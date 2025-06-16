@@ -57,7 +57,7 @@ class DashboardService(
     }
 
     fun obterUltimasMovimentacoes(): List<UltimaMovimentacaoDTO> {
-        val receitas = receitaRepository.findTop5ByOrderByDataDesc()
+        val receitas = receitaRepository.findTop5ByAtivoTrueOrderByDataDesc()
             .map {
                 UltimaMovimentacaoDTO(
                     data = it.data,
@@ -68,7 +68,7 @@ class DashboardService(
                 )
             }
 
-        val despesas = despesaRepository.findTop5ByOrderByDataDesc()
+        val despesas = despesaRepository.findTop5ByAtivoTrueOrderByDataDesc()
             .map {
                 UltimaMovimentacaoDTO(
                     data = it.data,
