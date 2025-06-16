@@ -6,6 +6,7 @@ import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.model.Categoria
 import com.contasimplesmei.repository.CategoriaRepository
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class CategoriaService(
@@ -13,7 +14,7 @@ class CategoriaService(
 ) {
 
     fun listar(): List<CategoriaResponseDTO> =
-        repository.findAll().map { it.toResponseDTO() }
+        repository.findAllByAtivoTrue().map { it.toResponseDTO() }
 
     fun listarPorTipo(tipo: String): List<CategoriaResponseDTO> {
         val tipoCategoria = runCatching {
@@ -22,7 +23,7 @@ class CategoriaService(
             throw IllegalArgumentException("Tipo de categoria inválido: $tipo. Use RECEITA ou DESPESA.")
         }
 
-        return repository.findAllByTipo(tipoCategoria).map { it.toResponseDTO() }
+        return repository.findAllByTipoAndAtivoTrue(tipoCategoria).map { it.toResponseDTO() }
     }
 
     fun criar(dto: CategoriaRequestDTO): CategoriaResponseDTO {
@@ -30,10 +31,16 @@ class CategoriaService(
         return repository.save(categoria).toResponseDTO()
     }
 
-    fun deletar(id: Long) {
-        repository.deleteById(id)
+    fun deletar(id: UUID) {
+        val categoria = repository.findById(id)
+            .orElseThrow { IllegalStateException("Despesa não encontrada para deleção") }
+
+        if(!categoria.ativo) throw IllegalArgumentException("Categoria já inativa")
+
+        val categoriaInativa = categoria.copy(ativo = false)
+        repository.save(categoriaInativa)
     }
 
-    fun buscarPorId(id: Long): CategoriaResponseDTO =
+    fun buscarPorId(id: UUID): CategoriaResponseDTO =
         repository.findById(id).orElseThrow { RuntimeException("Categoria não encontrada") }.toResponseDTO()
 }

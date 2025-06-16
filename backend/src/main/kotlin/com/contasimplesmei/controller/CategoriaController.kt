@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/categorias")
@@ -32,11 +33,11 @@ class CategoriaController(
         ResponseEntity.status(HttpStatus.CREATED).body(service.criar(dto))
 
     @GetMapping("/{id}")
-    fun buscarPorId(@PathVariable id: Long): ResponseEntity<CategoriaResponseDTO> =
+    fun buscarPorId(@PathVariable id: UUID): ResponseEntity<CategoriaResponseDTO> =
         ResponseEntity.ok(service.buscarPorId(id))
 
     @DeleteMapping("/{id}")
-    fun deletar(@PathVariable id: Long): ResponseEntity<Void> {
+    fun deletar(@PathVariable id: UUID): ResponseEntity<Void> {
         service.deletar(id)
         return ResponseEntity.noContent().build()
     }

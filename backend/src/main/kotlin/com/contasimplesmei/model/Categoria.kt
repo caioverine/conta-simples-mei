@@ -21,5 +21,7 @@ data class Categoria(
     val nome: String? = null,
 
     @Column(nullable = false)
-    val tipo: String? = null
+    val tipo: String? = null,
+
+    val ativo: Boolean = true
 )
