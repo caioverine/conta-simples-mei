@@ -16,3 +16,7 @@ export const salvarDespesa = async (dados: DespesaFormData) => {
 export const atualizarDespesa = async (dados: DespesaFormData) => {
   return api.put<Despesa>(`/despesas/${dados.id}`, dados);
 };
+
+export const excluirDespesa = async (id: string) => {
+  return api.delete(`/despesas/${id}`);
+}

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import { format, subMonths } from "date-fns";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { atualizarDespesa, listarDespesas, salvarDespesa } from "../../services/despesa-service";
+import { atualizarDespesa, excluirDespesa, listarDespesas, salvarDespesa } from "../../services/despesa-service";
 import type { Despesa } from "../../model/despesa-model";
 import Pagination from "../../components/Pagination";
 import { ptBR } from "date-fns/locale";
@@ -106,6 +106,26 @@ const Despesas = () => {
     setShowModal(true);
   };
 
+  const handleDeleteClick = async (despesa: Despesa) => {
+    if (window.confirm(`Deseja realmente excluir a despesa "${despesa.descricao}"?`)) {
+      setLoading(true);
+      setError(null);
+      try {
+        await excluirDespesa(despesa.id);
+        setSuccess("Despesa excluída com sucesso!");
+        // Recarrega a lista após excluir
+        const resp = await listarDespesas(page, size);
+        setDespesas(resp.data.content);
+        setTotalPages(resp.data.totalPages);
+      } catch (err: unknown) {
+        console.error("Erro ao excluir despesa:", err);
+        setError("Erro ao excluir despesa. Tente novamente.");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <>
       <Navbar titulo="Despesas" />
@@ -189,6 +209,7 @@ const Despesas = () => {
                           title="Excluir"
                           aria-label="Excluir"
                           style={{ border: "none" }}
+                          onClick={() => handleDeleteClick(d)}
                         >
                           <FaTrash size={20} />
                         </button>
