@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaTrash } from "react-icons/fa";
 import { listarCategorias, salvarCategoria } from "../../services/categoria-service";
 import type { Categoria } from "../../model/categoria-model";
 import ModalNovaCategoria, { type CategoriaFormData } from "./ModalNovaCategoria";
@@ -113,15 +113,6 @@ const Categorias = () => {
                         {cat.tipo ?? "-"}
                       </td>
                       <td className="py-2 px-3 rounded-r-lg flex justify-center gap-2">
-                        <button
-                          className="!p-0 rounded-full text-[#234557] dark:text-gray-200 hover:text-[#2B9669] transition-colors border-none focus:outline-none"
-                          title="Editar"
-                          aria-label="Editar"
-                          type="button"
-                          style={{ background: "transparent", border: "none" }}
-                        >
-                          <FaEdit size={20} />
-                        </button>
                         <button
                           className="!p-0 rounded-full text-[#234557] dark:text-gray-200 hover:text-[#2B9669] transition-colors border-none focus:outline-none"
                           title="Excluir"
