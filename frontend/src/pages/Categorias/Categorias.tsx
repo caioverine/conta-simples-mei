@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import { FaPlus, FaTrash } from "react-icons/fa";
-import { listarCategorias, salvarCategoria } from "../../services/categoria-service";
+import { excluirCatefgoria, listarCategorias, salvarCategoria } from "../../services/categoria-service";
 import type { Categoria } from "../../model/categoria-model";
 import ModalNovaCategoria, { type CategoriaFormData } from "./ModalNovaCategoria";
 import { ModalSucesso } from "../../components/ModalSucesso";
@@ -47,6 +47,25 @@ const Categorias = () => {
       setLoading(false);
     }
   };
+
+  const handleDeleteClick = async (categoria: Categoria) => {
+      if (window.confirm(`Deseja realmente excluir a categoria "${categoria.nome}"?`)) {
+        setLoading(true);
+        setError(null);
+        try {
+          await excluirCatefgoria(categoria.id);
+          setSuccess("Categoria excluída com sucesso!");
+          // Recarrega a lista após excluir
+          const resp = await listarCategorias();
+          setCategorias(resp.data);
+        } catch (err: unknown) {
+          console.error("Erro ao excluir categoria:", err);
+          setError("Erro ao excluir categoria. Tente novamente.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
 
   return (
     <>
@@ -119,6 +138,7 @@ const Categorias = () => {
                           aria-label="Excluir"
                           type="button"
                           style={{ background: "transparent", border: "none" }}
+                          onClick={() => handleDeleteClick(cat)}
                         >
                           <FaTrash size={20} />
                         </button>

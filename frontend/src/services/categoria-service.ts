@@ -17,3 +17,7 @@ export const listarCategoriasDespesa = async () => {
 export const salvarCategoria = async (dados: CategoriaFormData) => {
   return api.post<Categoria>("/categorias", dados);
 }
+
+export const excluirCatefgoria = async (id: string) => {
+  return api.delete(`/categorias/${id}`);
+}
