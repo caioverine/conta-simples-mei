@@ -1,6 +1,8 @@
 package com.contasimplesmei.repository
 
 import com.contasimplesmei.model.Receita
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -22,4 +24,6 @@ interface ReceitaRepository : JpaRepository<Receita, UUID> {
 
     @Query("SELECT r FROM Receita r JOIN FETCH r.categoria WHERE r.id = :id AND r.ativo = true")
     fun findByIdWithCategoria(@Param("id") id: UUID): Optional<Receita>
+
+    fun findAllByAtivoTrue(pageable: Pageable): Page<Receita>
 }

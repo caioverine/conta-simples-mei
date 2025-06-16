@@ -19,7 +19,7 @@ class DespesaService(
 ) {
     fun listarDespesasPaginadas(page: Int, size: Int): Page<DespesaResponseDTO> {
         val pageable = PageRequest.of(page, size, Sort.by("data").descending())
-        return repository.findAll(pageable).map { it.toResponseDTO() }
+        return repository.findAllByAtivoTrue(pageable).map { it.toResponseDTO() }
     }
 
     fun buscarPorId(id: UUID): Despesa? = repository.findById(id).orElse(null)
@@ -45,7 +45,7 @@ class DespesaService(
 
     fun deletar(id: UUID) {
         val despesa = repository.findById(id)
-            .orElseThrow { IllegalStateException("Despesa não encontrada após o save") }
+            .orElseThrow { IllegalStateException("Despesa não encontrada para deleção") }
 
         if(!despesa.ativo) throw IllegalStateException("Despesa já inativa")
 

@@ -19,7 +19,7 @@ class ReceitaService(
 ) {
     fun listarReceitasPaginadas(page: Int, size: Int): Page<ReceitaResponseDTO> {
         val pageable = PageRequest.of(page, size, Sort.by("data").descending())
-        return repository.findAll(pageable).map {it.toResponseDTO()}
+        return repository.findAllByAtivoTrue(pageable).map {it.toResponseDTO()}
     }
 
     fun buscarPorId(id: UUID): Receita? = repository.findById(id).orElse(null)
@@ -45,7 +45,7 @@ class ReceitaService(
 
     fun deletar(id: UUID) {
         val receita = repository.findById(id)
-            .orElseThrow { IllegalStateException("Receita não encontrada após o save") }
+            .orElseThrow { IllegalStateException("Receita não encontrada para deleção") }
 
         if(!receita.ativo) throw IllegalStateException("Receita já inativa")
 
