@@ -9,17 +9,17 @@ import java.util.Optional
 import java.util.UUID
 
 interface ReceitaRepository : JpaRepository<Receita, UUID> {
-    @Query("SELECT SUM(r.valor) FROM Receita r")
+    @Query("SELECT SUM(r.valor) FROM Receita r WHERE r.ativo = true")
     fun sumValor(): BigDecimal?
 
-    @Query("SELECT SUM(r.valor) FROM Receita r WHERE MONTH(r.data) = :mes AND YEAR(r.data) = :ano")
+    @Query("SELECT SUM(r.valor) FROM Receita r WHERE MONTH(r.data) = :mes AND YEAR(r.data) = :ano AND r.ativo = true")
     fun sumByMes(ano: Int, mes: Int): BigDecimal?
 
-    @Query("SELECT SUM(r.valor) FROM Receita r WHERE MONTH(r.data) = MONTH(CURRENT_DATE) AND YEAR(r.data) = YEAR(CURRENT_DATE)")
+    @Query("SELECT SUM(r.valor) FROM Receita r WHERE MONTH(r.data) = MONTH(CURRENT_DATE) AND YEAR(r.data) = YEAR(CURRENT_DATE) AND r.ativo = true")
     fun sumByMesAtual(): BigDecimal
 
-    fun findTop5ByOrderByDataDesc(): List<Receita>
+    fun findTop5ByAtivoTrueOrderByDataDesc(): List<Receita>
 
-    @Query("SELECT r FROM Receita r JOIN FETCH r.categoria WHERE r.id = :id")
+    @Query("SELECT r FROM Receita r JOIN FETCH r.categoria WHERE r.id = :id AND r.ativo = true")
     fun findByIdWithCategoria(@Param("id") id: UUID): Optional<Receita>
 }

@@ -9,10 +9,9 @@ import com.contasimplesmei.model.Receita
 import com.contasimplesmei.repository.ReceitaRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 class ReceitaService(
@@ -44,5 +43,13 @@ class ReceitaService(
         }.orElse(null)
     }
 
-    fun deletar(id: UUID) = repository.deleteById(id)
+    fun deletar(id: UUID) {
+        val receita = repository.findById(id)
+            .orElseThrow { IllegalStateException("Receita não encontrada após o save") }
+
+        if(!receita.ativo) throw IllegalStateException("Receita já inativa")
+
+        val receitaInativa = receita.copy(ativo = false)
+        repository.save(receitaInativa)
+    }
 }
