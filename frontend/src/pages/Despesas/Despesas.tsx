@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import { format, subMonths } from "date-fns";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { listarDespesas, salvarDespesa } from "../../services/despesa-service";
+import { atualizarDespesa, listarDespesas, salvarDespesa } from "../../services/despesa-service";
 import type { Despesa } from "../../model/despesa-model";
 import Pagination from "../../components/Pagination";
 import { ptBR } from "date-fns/locale";
@@ -24,6 +24,7 @@ const Despesas = () => {
   const [filtroMes, setFiltroMes] = useState(meses[0].value);
   const [filtroCategoria, setFiltroCategoria] = useState("Todos");
   const [despesas, setDespesas] = useState<Despesa[]>([]);
+  const [despesaEditando, setDespesaEditando] = useState<Despesa | null>(null);
   const [categorias, setCategorias] = useState<string[]>(["Todos"]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -74,24 +75,36 @@ const Despesas = () => {
   });
 
   // Função para salvar nova despesa
-    const handleSaveDespesa = async (data: DespesaFormData) => {
-      setLoading(true);
-      setError(null);
-      try {
+  const handleSaveDespesa = async (data: DespesaFormData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      if(despesaEditando) {
+        await atualizarDespesa(data);
+        setSuccess("Despesa atualizada com sucesso!");
+      } else {
         await salvarDespesa(data);
-        // Recarrega a lista após salvar
-        const resp = await listarDespesas(page, size);
-        setDespesas(resp.data.content);
-        setTotalPages(resp.data.totalPages);
-        setShowModal(false);
         setSuccess("Despesa cadastrada com sucesso!");
-      } catch (err: unknown) {
-        console.error("Erro ao salvar despesa:", err);
-        setError("Erro ao salvar despesa. Tente novamente.");
-      } finally {
-        setLoading(false);
       }
-    };
+      // Recarrega a lista após salvar
+      const resp = await listarDespesas(page, size);
+      setDespesas(resp.data.content);
+      setTotalPages(resp.data.totalPages);
+      setShowModal(false);
+      setDespesaEditando(null);
+    } catch (err: unknown) {
+      setDespesaEditando(null);
+      console.error("Erro ao salvar despesa:", err);
+      setError("Erro ao salvar despesa. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditClick = (despesa: Despesa) => {
+    setDespesaEditando(despesa);
+    setShowModal(true);
+  };
 
   return (
     <>
@@ -167,6 +180,7 @@ const Despesas = () => {
                           title="Editar"
                           aria-label="Editar"
                           style={{ border: "none" }}
+                          onClick={() => handleEditClick(d)}
                         >
                           <FaEdit size={20} />
                         </button>
@@ -199,9 +213,11 @@ const Despesas = () => {
           onClose={() => {
             setShowModal(false);
             setError(null);
+            setDespesaEditando(null);
           }}
           onSave={handleSaveDespesa}
           error={error}
+          despesa={despesaEditando}
         />
       )}
       {success && (

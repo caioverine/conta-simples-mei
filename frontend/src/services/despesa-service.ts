@@ -12,3 +12,7 @@ export const listarDespesas = async (page: number, size: number) => {
 export const salvarDespesa = async (dados: DespesaFormData) => {
   return api.post<Despesa>("/despesas", dados);
 };
+
+export const atualizarDespesa = async (dados: DespesaFormData) => {
+  return api.put<Despesa>(`/despesas/${dados.id}`, dados);
+};
