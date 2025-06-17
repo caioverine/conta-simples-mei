@@ -7,20 +7,23 @@ import com.contasimplesmei.dto.UltimaMovimentacaoDTO
 import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.repository.DespesaRepository
 import com.contasimplesmei.repository.ReceitaRepository
+import com.contasimplesmei.security.UsuarioAutenticadoProvider
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.YearMonth
 
 @Service
 class DashboardService(
+    private val usuarioAutenticadoProvider: UsuarioAutenticadoProvider,
     private val receitaRepository: ReceitaRepository,
     private val despesaRepository: DespesaRepository
 ) {
     fun obterResumoFinanceiro(): DashboardResumoDTO {
-        val totalReceitas = receitaRepository.sumValor() ?: BigDecimal.ZERO
-        val totalDespesas = despesaRepository.sumValor() ?: BigDecimal.ZERO
+        val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
+        val totalReceitas = receitaRepository.sumValor(usuarioLogado.id!!) ?: BigDecimal.ZERO
+        val totalDespesas = despesaRepository.sumValor(usuarioLogado.id!!) ?: BigDecimal.ZERO
         val saldoAtual = totalReceitas - totalDespesas
-        val resultadoMensal = receitaRepository.sumByMesAtual() - despesaRepository.sumByMesAtual()
+        val resultadoMensal = receitaRepository.sumByMesAtual(usuarioLogado.id!!) - despesaRepository.sumByMesAtual(usuarioLogado.id!!)
 
         return DashboardResumoDTO(
             saldoAtual = saldoAtual,
@@ -31,13 +34,14 @@ class DashboardService(
     }
 
     fun obterEvolucaoSaldoMensal(): List<SaldoMensalDTO> {
+        val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
         val meses = gerarUltimosMeses(3)
         val resultado = mutableListOf<SaldoMensalDTO>()
         var saldoAcumulado = BigDecimal.ZERO
 
         for (mes in meses) {
-            val receitas = receitaRepository.sumByMes(mes.year, mes.monthValue) ?: BigDecimal.ZERO
-            val despesas = despesaRepository.sumByMes(mes.year, mes.monthValue) ?: BigDecimal.ZERO
+            val receitas = receitaRepository.sumByMes(usuarioLogado.id!!, mes.year, mes.monthValue) ?: BigDecimal.ZERO
+            val despesas = despesaRepository.sumByMes(usuarioLogado.id!!, mes.year, mes.monthValue) ?: BigDecimal.ZERO
             saldoAcumulado += (receitas - despesas)
 
             resultado.add(SaldoMensalDTO("${mes.monthValue.toString().padStart(2, '0')}/${mes.year}", saldoAcumulado))
@@ -47,7 +51,8 @@ class DashboardService(
     }
 
     fun obterDespesasPorCategoria(): List<DespesaPorCategoriaDTO> {
-        return despesaRepository.sumGroupByCategoria()
+        val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
+        return despesaRepository.sumGroupByCategoria(usuarioLogado.id!!)
             .map {
                 DespesaPorCategoriaDTO(
                     categoria = it.categoria.toResponseDTO(),
@@ -57,7 +62,8 @@ class DashboardService(
     }
 
     fun obterUltimasMovimentacoes(): List<UltimaMovimentacaoDTO> {
-        val receitas = receitaRepository.findTop5ByAtivoTrueOrderByDataDesc()
+        val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
+        val receitas = receitaRepository.findTop5ByAtivoTrueAndUsuarioIdOrderByDataDesc(usuarioLogado.id!!)
             .map {
                 UltimaMovimentacaoDTO(
                     data = it.data,
@@ -68,7 +74,7 @@ class DashboardService(
                 )
             }
 
-        val despesas = despesaRepository.findTop5ByAtivoTrueOrderByDataDesc()
+        val despesas = despesaRepository.findTop5ByAtivoTrueAndUsuarioIdOrderByDataDesc(usuarioLogado.id!!)
             .map {
                 UltimaMovimentacaoDTO(
                     data = it.data,

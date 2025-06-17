@@ -4,8 +4,6 @@ import com.contasimplesmei.dto.DespesaRequestDTO
 import com.contasimplesmei.dto.DespesaResponseDTO
 import com.contasimplesmei.mapper.toEntity
 import com.contasimplesmei.mapper.toResponseDTO
-import com.contasimplesmei.model.Categoria
-import com.contasimplesmei.model.Despesa
 import com.contasimplesmei.repository.CategoriaRepository
 import com.contasimplesmei.repository.DespesaRepository
 import com.contasimplesmei.security.UsuarioAutenticadoProvider
@@ -22,8 +20,9 @@ class DespesaService(
     private val categoriaRepository: CategoriaRepository
 ) {
     fun listarDespesasPaginadas(page: Int, size: Int): Page<DespesaResponseDTO> {
+        val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
         val pageable = PageRequest.of(page, size, Sort.by("data").descending())
-        return repository.findAllByAtivoTrue(pageable).map { it.toResponseDTO() }
+        return repository.findAllByAtivoTrueAndUsuarioId(pageable, usuarioLogado.id!!).map { it.toResponseDTO() }
     }
 
     fun buscarPorId(id: UUID): DespesaResponseDTO? = repository.findById(id).orElse(null).toResponseDTO()
@@ -32,10 +31,9 @@ class DespesaService(
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
         val categoria = categoriaRepository.findByIdAndUsuarioId(dto.idCategoria, usuarioLogado.id!!)
-            ?: throw IllegalStateException("Categoria Inválida ou não pertence ao usuário logado")
 
         val despesSalva = repository.save(dto.toEntity(usuarioLogado, categoria))
-        val despesaCompleta = repository.findByIdWithCategoria(despesSalva.id!!)
+        val despesaCompleta = repository.findByIdWithCategoria(despesSalva.id!!, usuarioLogado.id!!)
             .orElseThrow { IllegalStateException("Despesa não encontrada após o save") }
         return despesaCompleta.toResponseDTO()
     }
@@ -45,11 +43,10 @@ class DespesaService(
 
         val despesa = repository.findById(id)
             .orElse(null)
-            ?.takeIf { it.usuario?.id == usuarioLogado.id }
+            ?.takeIf { it.usuario.id == usuarioLogado.id }
             ?: throw IllegalStateException("Despesa não encontrada ou não pertence ao usuário logado")
 
         val categoria = categoriaRepository.findByIdAndUsuarioId(dto.idCategoria, usuarioLogado.id!!)
-            ?: throw IllegalStateException("Categoria Inválida ou não pertence ao usuário logado")
 
         val despesaAtualizada = despesa.copy(
             descricao = dto.descricao,
@@ -67,7 +64,7 @@ class DespesaService(
         val despesa = repository.findById(id)
             .orElseThrow { IllegalStateException("Despesa não encontrada para deleção") }
 
-        if (despesa.usuario?.id != usuarioLogado.id) {
+        if (despesa.usuario.id != usuarioLogado.id) {
             throw IllegalStateException("Despesa não pertence ao usuário logado")
         }
 

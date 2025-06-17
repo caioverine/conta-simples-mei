@@ -22,8 +22,9 @@ class ReceitaService(
     private val categoriaRepository: CategoriaRepository
 ) {
     fun listarReceitasPaginadas(page: Int, size: Int): Page<ReceitaResponseDTO> {
+        val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
         val pageable = PageRequest.of(page, size, Sort.by("data").descending())
-        return repository.findAllByAtivoTrue(pageable).map {it.toResponseDTO()}
+        return repository.findAllByAtivoTrueAndUsuarioId(pageable, usuarioLogado.id!!).map {it.toResponseDTO()}
     }
 
     fun buscarPorId(id: UUID): ReceitaResponseDTO? = repository.findById(id).orElse(null).toResponseDTO()
@@ -32,10 +33,9 @@ class ReceitaService(
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
         val categoria = categoriaRepository.findByIdAndUsuarioId(dto.idCategoria, usuarioLogado.id!!)
-            ?: throw IllegalStateException("Categoria Inválida ou não pertence ao usuário logado")
 
         val receitaSalva = repository.save(dto.toEntity(usuarioLogado, categoria))
-        val receitaCompleta = repository.findByIdWithCategoria(receitaSalva.id!!)
+        val receitaCompleta = repository.findByIdWithCategoria(receitaSalva.id!!, usuarioLogado.id!!)
             .orElseThrow { IllegalStateException("Receita não encontrada após o save") }
         return receitaCompleta.toResponseDTO()
     }
@@ -45,11 +45,10 @@ class ReceitaService(
 
         val receita = repository.findById(id)
             .orElse(null)
-            ?.takeIf { it.usuario?.id == usuarioLogado.id }
+            ?.takeIf { it.usuario.id == usuarioLogado.id }
             ?: throw IllegalStateException("Receita não encontrada ou não pertence ao usuário logado")
 
         val categoria = categoriaRepository.findByIdAndUsuarioId(dto.idCategoria, usuarioLogado.id!!)
-            ?: throw IllegalStateException("Categoria inválida ou não pertence ao usuário logado")
 
         val receitaAtualizada = receita.copy(
             descricao = dto.descricao,
@@ -67,7 +66,7 @@ class ReceitaService(
         val receita = repository.findById(id)
             .orElseThrow { IllegalStateException("Receita não encontrada para deleção") }
 
-        if (receita.usuario?.id != usuarioLogado.id) {
+        if (receita.usuario.id != usuarioLogado.id) {
             throw IllegalStateException("Receita não pertence ao usuário logado")
         }
 

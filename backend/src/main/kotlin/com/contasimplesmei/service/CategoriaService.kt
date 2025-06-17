@@ -15,17 +15,20 @@ class CategoriaService(
     private val repository: CategoriaRepository
 ) {
 
-    fun listar(): List<CategoriaResponseDTO> =
-        repository.findAllByAtivoTrue().map { it.toResponseDTO() }
+    fun listar(): List<CategoriaResponseDTO> {
+        val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
+        return repository.findAllByAtivoTrueAndUsuarioId(usuarioLogado.id!!).map { it.toResponseDTO() }
+    }
 
     fun listarPorTipo(tipo: String): List<CategoriaResponseDTO> {
+        val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
         val tipoCategoria = runCatching {
             tipo.uppercase()
         }.getOrElse {
             throw IllegalArgumentException("Tipo de categoria inválido: $tipo. Use RECEITA ou DESPESA.")
         }
 
-        return repository.findAllByTipoAndAtivoTrue(tipoCategoria).map { it.toResponseDTO() }
+        return repository.findAllByTipoAndAtivoTrueAndUsuarioId(tipoCategoria, usuarioLogado.id!!).map { it.toResponseDTO() }
     }
 
     fun criar(dto: CategoriaRequestDTO): CategoriaResponseDTO {
@@ -40,7 +43,7 @@ class CategoriaService(
         val categoria = repository.findById(id)
             .orElseThrow { IllegalStateException("Categoria não encontrada para deleção") }
 
-        if (categoria.usuario?.id != usuarioLogado.id) {
+        if (categoria.usuario.id != usuarioLogado.id) {
             throw IllegalStateException("Categoria não pertence ao usuário logado")
         }
 
