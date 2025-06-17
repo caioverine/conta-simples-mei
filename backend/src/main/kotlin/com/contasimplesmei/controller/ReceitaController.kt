@@ -29,21 +29,20 @@ class ReceitaController(
     @GetMapping("/{id}")
     fun buscarPorId(@PathVariable id: UUID): ResponseEntity<ReceitaResponseDTO> {
         val receita = service.buscarPorId(id)
-        return if (receita != null) ResponseEntity.ok(receita.toResponseDTO())
+        return if (receita != null) ResponseEntity.ok(receita)
         else ResponseEntity.notFound().build()
     }
 
     @PostMapping
     fun criar(@RequestBody @Valid dto: ReceitaRequestDTO): ResponseEntity<ReceitaResponseDTO> {
         val receita = service.criar(dto)
-        return ResponseEntity.status(HttpStatus.CREATED).body(receita.toResponseDTO())
+        return ResponseEntity.status(HttpStatus.CREATED).body(receita)
     }
 
     @PutMapping("/{id}")
     fun atualizar(@PathVariable id: UUID, @RequestBody dto: ReceitaRequestDTO): ResponseEntity<ReceitaResponseDTO> {
         val receita = service.atualizar(id, dto)
-        return if (receita != null) ResponseEntity.ok(receita.toResponseDTO())
-        else ResponseEntity.notFound().build()
+        return ResponseEntity.ok(receita)
     }
 
     @DeleteMapping("/{id}")

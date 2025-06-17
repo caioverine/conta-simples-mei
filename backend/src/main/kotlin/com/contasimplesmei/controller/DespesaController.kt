@@ -36,20 +36,20 @@ class DespesaController(
     @GetMapping("/{id}")
     fun buscarPorId(@PathVariable id: UUID): ResponseEntity<DespesaResponseDTO> {
         val despesa = service.buscarPorId(id)
-        return if (despesa != null) ResponseEntity.ok(despesa.toResponseDTO())
+        return if (despesa != null) ResponseEntity.ok(despesa)
         else ResponseEntity.notFound().build()
     }
 
     @PostMapping
     fun criar(@RequestBody @Valid dto: DespesaRequestDTO): ResponseEntity<DespesaResponseDTO> {
         val despesa = service.criar(dto)
-        return ResponseEntity.status(HttpStatus.CREATED).body(despesa.toResponseDTO())
+        return ResponseEntity.status(HttpStatus.CREATED).body(despesa)
     }
 
     @PutMapping("/{id}")
     fun atualizar(@PathVariable id: UUID, @RequestBody dto: DespesaRequestDTO): ResponseEntity<DespesaResponseDTO> {
         val despesa = service.atualizar(id, dto)
-        return if (despesa != null) ResponseEntity.ok(despesa.toResponseDTO())
+        return if (despesa != null) ResponseEntity.ok(despesa)
         else ResponseEntity.notFound().build()
     }
 

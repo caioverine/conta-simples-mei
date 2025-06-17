@@ -21,5 +21,9 @@ data class Receita(
     @JoinColumn(name = "categoria_id")
     val categoria: Categoria,
 
-    val ativo: Boolean = true
+    val ativo: Boolean = true,
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    val usuario: Usuario
 )

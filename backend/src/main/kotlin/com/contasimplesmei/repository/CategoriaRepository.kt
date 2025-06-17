@@ -8,4 +8,6 @@ interface CategoriaRepository : JpaRepository<Categoria, UUID> {
     fun findAllByTipoAndAtivoTrue(tipo: String): List<Categoria>
 
     fun findAllByAtivoTrue(): List<Categoria>
+
+    fun findByIdAndUsuarioId(id: UUID, idUsuario: UUID): Categoria
 }

@@ -4,6 +4,7 @@ import com.contasimplesmei.dto.DespesaRequestDTO
 import com.contasimplesmei.dto.DespesaResponseDTO
 import com.contasimplesmei.model.Categoria
 import com.contasimplesmei.model.Despesa
+import com.contasimplesmei.model.Usuario
 
 fun Despesa.toResponseDTO(): DespesaResponseDTO =
     DespesaResponseDTO(
@@ -14,11 +15,12 @@ fun Despesa.toResponseDTO(): DespesaResponseDTO =
         data = this.data
     )
 
-fun DespesaRequestDTO.toEntity(): Despesa =
+fun DespesaRequestDTO.toEntity(usuarioLogado: Usuario, categoria: Categoria): Despesa =
     Despesa(
         id = null,
-        categoria = Categoria(id = this.idCategoria),
+        categoria = categoria,
         descricao = this.descricao,
         valor = this.valor,
-        data = this.data
+        data = this.data,
+        usuario = usuarioLogado
     )

@@ -5,11 +5,13 @@ import com.contasimplesmei.dto.CategoriaResponseDTO
 import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.model.Categoria
 import com.contasimplesmei.repository.CategoriaRepository
+import com.contasimplesmei.security.UsuarioAutenticadoProvider
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
 class CategoriaService(
+    private val usuarioAutenticadoProvider: UsuarioAutenticadoProvider,
     private val repository: CategoriaRepository
 ) {
 
@@ -27,13 +29,20 @@ class CategoriaService(
     }
 
     fun criar(dto: CategoriaRequestDTO): CategoriaResponseDTO {
-        val categoria = Categoria(nome = dto.nome, tipo = dto.tipo)
+        val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
+        val categoria = Categoria(nome = dto.nome, tipo = dto.tipo, usuario = usuarioLogado)
         return repository.save(categoria).toResponseDTO()
     }
 
     fun deletar(id: UUID) {
+        val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
+
         val categoria = repository.findById(id)
-            .orElseThrow { IllegalStateException("Despesa não encontrada para deleção") }
+            .orElseThrow { IllegalStateException("Categoria não encontrada para deleção") }
+
+        if (categoria.usuario?.id != usuarioLogado.id) {
+            throw IllegalStateException("Categoria não pertence ao usuário logado")
+        }
 
         if(!categoria.ativo) throw IllegalArgumentException("Categoria já inativa")
 
