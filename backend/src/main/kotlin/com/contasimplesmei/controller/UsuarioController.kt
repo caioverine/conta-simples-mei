@@ -3,6 +3,7 @@ package com.contasimplesmei.controller
 import com.contasimplesmei.dto.UsuarioRequestDTO
 import com.contasimplesmei.dto.UsuarioResponseDTO
 import com.contasimplesmei.mapper.toResponseDTO
+import com.contasimplesmei.service.CategoriaService
 import com.contasimplesmei.service.UsuarioService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -19,12 +20,14 @@ import java.util.UUID
 @RestController
 @RequestMapping("/usuarios")
 class UsuarioController(
-    private val service: UsuarioService
+    private val service: UsuarioService,
+    private val categoriaService: CategoriaService
 ) {
 
     @PostMapping
     fun criar(@RequestBody @Valid dto: UsuarioRequestDTO): ResponseEntity<UsuarioResponseDTO> {
         val usuario = service.criar(dto)
+        categoriaService.criarCategoriasPadraoParaUsuario(usuario)
         return ResponseEntity.status(HttpStatus.CREATED).body(usuario.toResponseDTO())
     }
 

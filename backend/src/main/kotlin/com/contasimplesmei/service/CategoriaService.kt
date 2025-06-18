@@ -4,10 +4,11 @@ import com.contasimplesmei.dto.CategoriaRequestDTO
 import com.contasimplesmei.dto.CategoriaResponseDTO
 import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.model.Categoria
+import com.contasimplesmei.model.Usuario
 import com.contasimplesmei.repository.CategoriaRepository
 import com.contasimplesmei.security.UsuarioAutenticadoProvider
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 class CategoriaService(
@@ -55,4 +56,33 @@ class CategoriaService(
 
     fun buscarPorId(id: UUID): CategoriaResponseDTO =
         repository.findById(id).orElseThrow { RuntimeException("Categoria não encontrada") }.toResponseDTO()
+
+    fun criarCategoriasPadraoParaUsuario(usuario: Usuario) {
+        val categorias: MutableList<Categoria> = mutableListOf()
+        preencherCategoriasReceitaPadraoParaUsuario(categorias, usuario)
+        preencherCategoriasDespesaPadraoParaUsuario(categorias, usuario)
+        repository.saveAll(categorias)
+    }
+
+    private fun preencherCategoriasReceitaPadraoParaUsuario(categorias: MutableList<Categoria>, usuario: Usuario) {
+        categorias.addAll( listOf(
+            Categoria(nome = "Venda de produtos", tipo = "RECEITA", usuario = usuario),
+            Categoria(nome = "Prestação de serviços", tipo = "RECEITA", usuario = usuario),
+            Categoria(nome = "Rendimentos financeiros", tipo = "RECEITA", usuario = usuario),
+            Categoria(nome = "Outros recebimentos", tipo = "RECEITA", usuario = usuario)
+        ))
+    }
+
+    private fun preencherCategoriasDespesaPadraoParaUsuario(categorias: MutableList<Categoria>, usuario: Usuario) {
+        categorias.addAll(listOf(
+            Categoria(nome = "Aluguel e infraestrutura", tipo = "DESPESA", usuario = usuario),
+            Categoria(nome = "Materiais e insumos", tipo = "DESPESA", usuario = usuario),
+            Categoria(nome = "Transporte e logística", tipo = "DESPESA", usuario = usuario),
+            Categoria(nome = "Contas e utilidades", tipo = "DESPESA", usuario = usuario),
+            Categoria(nome = "Marketing e divulgação", tipo = "DESPESA", usuario = usuario),
+            Categoria(nome = "Impostos e taxas", tipo = "DESPESA", usuario = usuario),
+            Categoria(nome = "Despesas bancárias", tipo = "DESPESA", usuario = usuario),
+            Categoria(nome = "Outras despesas", tipo = "DESPESA", usuario = usuario)
+        ))
+    }
 }
