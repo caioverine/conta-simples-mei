@@ -91,7 +91,7 @@ export default function Sidebar() {
           </li>
         </ul>
       </nav>
-      <div className="p-0 flex">
+      <div className="p-0 flex mt-auto">
         <button
           className="sidebar-logout-btn flex items-center justify-center md:justify-start w-full h-8 md:h-auto rounded transition-colors bg-[#234557] text-white md:px-2 md:py-2 dark:bg-gray-800 dark:text-gray-200"
           onClick={handleLogout}

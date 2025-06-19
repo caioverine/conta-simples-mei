@@ -78,7 +78,7 @@ const Categorias = () => {
                 {/* Linha de filtro + botão */}
                 <tr>
                   <th colSpan={3} className="pb-2 px-3 bg-gray-50 dark:bg-gray-900 rounded-t-lg">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div className="flex flex-row flex-nowrap items-center justify-between gap-2 mt-2">
                       <input
                         type="text"
                         placeholder="Filtrar por nome..."
@@ -86,7 +86,7 @@ const Categorias = () => {
                         value={filtroNome}
                         onChange={(e) => setFiltroNome(e.target.value)}
                       />
-                      <button className="btn-icn flex items-center gap-2 font-medium"
+                      <button className="btn-icn flex items-center gap-2 font-medium shrink-0 ml-2 min-w-fit"
                         onClick={() => setShowModal(true)}>
                         <FaPlus />
                       </button>

@@ -136,8 +136,10 @@ const Receitas = () => {
                 {/* Linha de filtros + botão */}
                 <tr>
                   <th colSpan={5} className="pb-2 px-3 bg-gray-50 dark:bg-gray-900 rounded-t-lg">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mt-2">
-                      <div className="flex gap-2 flex-wrap">
+                    <div
+                      className="flex flex-row flex-nowrap items-center justify-between gap-2 mt-2"
+                    >
+                      <div className="flex gap-2 flex-wrap min-w-0">
                         <select
                           className="rounded border-gray-300 dark:border-gray-700 px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300"
                           value={filtroMes}
@@ -158,7 +160,7 @@ const Receitas = () => {
                         </select>
                       </div>
                       <button
-                        className="btn-icn flex items-center gap-2 font-medium"
+                        className="btn-icn flex items-center gap-2 font-medium shrink-0 ml-2 min-w-fit"
                         onClick={() => setShowModal(true)}
                       >
                         <FaPlus />
