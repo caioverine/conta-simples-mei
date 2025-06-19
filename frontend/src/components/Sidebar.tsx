@@ -14,7 +14,9 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="bg-white dark:bg-gray-900 h-full transition-all duration-300 flex flex-col w-16 sm:w-16 md:w-56">
+    <aside 
+      style={{ width: "var(--sidebar-width)" }}
+      className="fixed top-0 left-0 h-screen z-30 bg-white dark:bg-gray-900 transition-all duration-300 flex flex-col">
       <div className="p-4 flex items-center justify-center">
         <img
           src={logoGraficoSemFundo}

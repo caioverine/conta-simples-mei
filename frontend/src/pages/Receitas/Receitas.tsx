@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
-import { format, subMonths } from "date-fns";
+import { format, parseISO, subMonths } from "date-fns";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { atualizarReceita, excluirReceita, listarReceitas, salvarReceita } from "../../services/receita-service";
 import { listarCategoriasReceita } from "../../services/categoria-service";
@@ -192,7 +192,7 @@ const Receitas = () => {
                       key={r.id}
                       className="bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg shadow-sm"
                     >
-                      <td className="py-2 px-3 rounded-l-lg font-mono text-sm text-center text-gray-700 dark:text-gray-300">{format(new Date(r.data), "dd/MM/yyyy")}</td>
+                      <td className="py-2 px-3 rounded-l-lg font-mono text-sm text-center text-gray-700 dark:text-gray-300">{format(parseISO(r.data), "dd/MM/yyyy")}</td>
                       <td className="py-2 px-3 text-center text-gray-700 dark:text-gray-300">{r.categoria.nome}</td>
                       <td className="py-2 px-3 text-center text-gray-700 dark:text-gray-300">{r.descricao}</td>
                       <td className="py-2 px-3 font-semibold text-green-600 dark:text-green-400 text-center">R$ {r.valor.toFixed(2)}</td>

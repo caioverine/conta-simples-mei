@@ -14,6 +14,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --sidebar-width: 13rem; 
 }
 
 a {
@@ -136,5 +138,9 @@ button:focus-visible {
 @media (max-width: 767px) {
   .sidebar-logout-btn {
     padding: 0 !important;
+  }
+
+  :root {
+    --sidebar-width: 4rem;
   }
 }

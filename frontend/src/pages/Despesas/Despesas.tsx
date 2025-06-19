@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
-import { format, subMonths } from "date-fns";
+import { format, parseISO, subMonths } from "date-fns";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { atualizarDespesa, excluirDespesa, listarDespesas, salvarDespesa } from "../../services/despesa-service";
 import type { Despesa } from "../../model/despesa-model";
@@ -190,7 +190,7 @@ const Despesas = () => {
                       key={d.id}
                       className="bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg shadow-sm"
                     >
-                      <td className="py-2 px-3 rounded-l-lg font-mono text-sm text-center text-gray-700 dark:text-gray-300">{format(new Date(d.data), "dd/MM/yyyy")}</td>
+                      <td className="py-2 px-3 rounded-l-lg font-mono text-sm text-center text-gray-700 dark:text-gray-300">{format(parseISO(d.data), "dd/MM/yyyy")}</td>
                       <td className="py-2 px-3 text-center text-gray-700 dark:text-gray-300">{d.categoria.nome}</td>
                       <td className="py-2 px-3 text-center text-gray-700 dark:text-gray-300">{d.descricao}</td>
                       <td className="py-2 px-3 font-semibold text-red-600 dark:text-red-400 text-center">R$ {d.valor.toFixed(2)}</td>

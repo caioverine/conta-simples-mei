@@ -1,5 +1,5 @@
 import { FaPlus } from "react-icons/fa";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 interface Movimentacao {
   data: string;
@@ -42,7 +42,7 @@ export default function UltimasMovimentacoes({ movimentacoes }: UltimasMovimenta
                 key={idx}
                 className="bg-gray-50 hover:bg-gray-100 transition rounded-lg shadow-sm"
               >
-                <td className="py-2 px-3 rounded-l-lg font-mono text-sm text-center">{format(new Date(mov.data), "dd/MM/yyyy")}</td>
+                <td className="py-2 px-3 rounded-l-lg font-mono text-sm text-center">{format(parseISO(mov.data), "dd/MM/yyyy")}</td>
                 <td
                   className={`py-2 px-3 font-semibold text-center ${
                     mov.valor < 0
