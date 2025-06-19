@@ -8,6 +8,7 @@ import com.contasimplesmei.model.Usuario
 import com.contasimplesmei.repository.CategoriaRepository
 import com.contasimplesmei.security.UsuarioAutenticadoProvider
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
@@ -32,12 +33,14 @@ class CategoriaService(
         return repository.findAllByTipoAndAtivoTrueAndUsuarioId(tipoCategoria, usuarioLogado.id!!).map { it.toResponseDTO() }
     }
 
+    @Transactional
     fun criar(dto: CategoriaRequestDTO): CategoriaResponseDTO {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
         val categoria = Categoria(nome = dto.nome, tipo = dto.tipo, usuario = usuarioLogado)
         return repository.save(categoria).toResponseDTO()
     }
 
+    @Transactional
     fun deletar(id: UUID) {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
@@ -57,6 +60,7 @@ class CategoriaService(
     fun buscarPorId(id: UUID): CategoriaResponseDTO =
         repository.findById(id).orElseThrow { RuntimeException("Categoria não encontrada") }.toResponseDTO()
 
+    @Transactional
     fun criarCategoriasPadraoParaUsuario(usuario: Usuario) {
         val categorias: MutableList<Categoria> = mutableListOf()
         preencherCategoriasReceitaPadraoParaUsuario(categorias, usuario)

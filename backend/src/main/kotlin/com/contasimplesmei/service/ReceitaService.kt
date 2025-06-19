@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
@@ -29,6 +30,7 @@ class ReceitaService(
 
     fun buscarPorId(id: UUID): ReceitaResponseDTO? = repository.findById(id).orElse(null).toResponseDTO()
 
+    @Transactional
     fun criar(dto: ReceitaRequestDTO): ReceitaResponseDTO {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
@@ -40,6 +42,7 @@ class ReceitaService(
         return receitaCompleta.toResponseDTO()
     }
 
+    @Transactional
     fun atualizar(id: UUID, dto: ReceitaRequestDTO): ReceitaResponseDTO {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
@@ -60,6 +63,7 @@ class ReceitaService(
         return repository.save(receitaAtualizada).toResponseDTO()
     }
 
+    @Transactional
     fun deletar(id: UUID) {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 

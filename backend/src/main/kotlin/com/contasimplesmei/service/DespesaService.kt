@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
@@ -27,6 +28,7 @@ class DespesaService(
 
     fun buscarPorId(id: UUID): DespesaResponseDTO? = repository.findById(id).orElse(null).toResponseDTO()
 
+    @Transactional
     fun criar(dto: DespesaRequestDTO): DespesaResponseDTO {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
@@ -38,6 +40,7 @@ class DespesaService(
         return despesaCompleta.toResponseDTO()
     }
 
+    @Transactional
     fun atualizar(id: UUID, dto: DespesaRequestDTO): DespesaResponseDTO? {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
@@ -58,6 +61,7 @@ class DespesaService(
         return repository.save(despesaAtualizada).toResponseDTO()
     }
 
+    @Transactional
     fun deletar(id: UUID) {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 

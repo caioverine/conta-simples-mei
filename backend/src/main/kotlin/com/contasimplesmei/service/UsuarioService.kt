@@ -6,6 +6,7 @@ import com.contasimplesmei.model.Usuario
 import com.contasimplesmei.repository.UsuarioRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
@@ -14,6 +15,7 @@ class UsuarioService(
     private val passwordEncoder: PasswordEncoder
 ) {
 
+    @Transactional
     fun criar(dto: UsuarioRequestDTO): Usuario {
         val senhaCriptografada = passwordEncoder.encode(dto.senha)
         return repository.save(dto.toEntity(senhaCriptografada))
@@ -27,6 +29,7 @@ class UsuarioService(
         return repository.findById(id).orElse(null)
     }
 
+    @Transactional
     fun deletar(id: UUID) {
         repository.deleteById(id)
     }
