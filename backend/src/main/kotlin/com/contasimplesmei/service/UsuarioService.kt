@@ -4,6 +4,7 @@ import com.contasimplesmei.dto.UsuarioRequestDTO
 import com.contasimplesmei.mapper.toEntity
 import com.contasimplesmei.model.Usuario
 import com.contasimplesmei.repository.UsuarioRepository
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -26,7 +27,7 @@ class UsuarioService(
     }
 
     fun buscarPorId(id: UUID): Usuario? {
-        return repository.findById(id).orElse(null)
+        return repository.findById(id).orElseThrow { EntityNotFoundException("Usuário não encontrado") }
     }
 
     @Transactional

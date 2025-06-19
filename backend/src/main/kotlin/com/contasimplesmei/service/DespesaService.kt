@@ -2,11 +2,13 @@ package com.contasimplesmei.service
 
 import com.contasimplesmei.dto.DespesaRequestDTO
 import com.contasimplesmei.dto.DespesaResponseDTO
+import com.contasimplesmei.exception.BusinessException
 import com.contasimplesmei.mapper.toEntity
 import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.repository.CategoriaRepository
 import com.contasimplesmei.repository.DespesaRepository
 import com.contasimplesmei.security.UsuarioAutenticadoProvider
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -26,7 +28,8 @@ class DespesaService(
         return repository.findAllByAtivoTrueAndUsuarioId(pageable, usuarioLogado.id!!).map { it.toResponseDTO() }
     }
 
-    fun buscarPorId(id: UUID): DespesaResponseDTO? = repository.findById(id).orElse(null).toResponseDTO()
+    fun buscarPorId(id: UUID): DespesaResponseDTO? =
+        repository.findById(id).orElseThrow { EntityNotFoundException("Despesa não encontrada") }.toResponseDTO()
 
     @Transactional
     fun criar(dto: DespesaRequestDTO): DespesaResponseDTO {
@@ -36,7 +39,7 @@ class DespesaService(
 
         val despesSalva = repository.save(dto.toEntity(usuarioLogado, categoria))
         val despesaCompleta = repository.findByIdWithCategoria(despesSalva.id!!, usuarioLogado.id!!)
-            .orElseThrow { IllegalStateException("Despesa não encontrada após o save") }
+            .orElseThrow { EntityNotFoundException("Despesa não encontrada após o save") }
         return despesaCompleta.toResponseDTO()
     }
 
@@ -47,7 +50,7 @@ class DespesaService(
         val despesa = repository.findById(id)
             .orElse(null)
             ?.takeIf { it.usuario.id == usuarioLogado.id }
-            ?: throw IllegalStateException("Despesa não encontrada ou não pertence ao usuário logado")
+            ?: throw EntityNotFoundException("Despesa não encontrada ou não pertence ao usuário logado")
 
         val categoria = categoriaRepository.findByIdAndUsuarioId(dto.idCategoria, usuarioLogado.id!!)
 
@@ -66,10 +69,10 @@ class DespesaService(
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
         val despesa = repository.findById(id)
-            .orElseThrow { IllegalStateException("Despesa não encontrada para deleção") }
+            .orElseThrow { EntityNotFoundException("Despesa não encontrada para deleção") }
 
         if (despesa.usuario.id != usuarioLogado.id) {
-            throw IllegalStateException("Despesa não pertence ao usuário logado")
+            throw BusinessException("Despesa não pertence ao usuário logado")
         }
 
         if (!despesa.ativo) {

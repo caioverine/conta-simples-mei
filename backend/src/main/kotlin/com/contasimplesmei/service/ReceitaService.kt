@@ -2,6 +2,7 @@ package com.contasimplesmei.service
 
 import com.contasimplesmei.dto.ReceitaRequestDTO
 import com.contasimplesmei.dto.ReceitaResponseDTO
+import com.contasimplesmei.exception.BusinessException
 import com.contasimplesmei.mapper.toEntity
 import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.model.Categoria
@@ -9,6 +10,7 @@ import com.contasimplesmei.model.Receita
 import com.contasimplesmei.repository.CategoriaRepository
 import com.contasimplesmei.repository.ReceitaRepository
 import com.contasimplesmei.security.UsuarioAutenticadoProvider
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -28,7 +30,8 @@ class ReceitaService(
         return repository.findAllByAtivoTrueAndUsuarioId(pageable, usuarioLogado.id!!).map {it.toResponseDTO()}
     }
 
-    fun buscarPorId(id: UUID): ReceitaResponseDTO? = repository.findById(id).orElse(null).toResponseDTO()
+    fun buscarPorId(id: UUID): ReceitaResponseDTO? =
+        repository.findById(id).orElseThrow { EntityNotFoundException("Receita não encontrada") }.toResponseDTO()
 
     @Transactional
     fun criar(dto: ReceitaRequestDTO): ReceitaResponseDTO {
@@ -38,7 +41,7 @@ class ReceitaService(
 
         val receitaSalva = repository.save(dto.toEntity(usuarioLogado, categoria))
         val receitaCompleta = repository.findByIdWithCategoria(receitaSalva.id!!, usuarioLogado.id!!)
-            .orElseThrow { IllegalStateException("Receita não encontrada após o save") }
+            .orElseThrow { EntityNotFoundException("Receita não encontrada após o save") }
         return receitaCompleta.toResponseDTO()
     }
 
@@ -49,7 +52,7 @@ class ReceitaService(
         val receita = repository.findById(id)
             .orElse(null)
             ?.takeIf { it.usuario.id == usuarioLogado.id }
-            ?: throw IllegalStateException("Receita não encontrada ou não pertence ao usuário logado")
+            ?: throw EntityNotFoundException("Receita não encontrada ou não pertence ao usuário logado")
 
         val categoria = categoriaRepository.findByIdAndUsuarioId(dto.idCategoria, usuarioLogado.id!!)
 
@@ -68,10 +71,10 @@ class ReceitaService(
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
         val receita = repository.findById(id)
-            .orElseThrow { IllegalStateException("Receita não encontrada para deleção") }
+            .orElseThrow { EntityNotFoundException("Receita não encontrada para deleção") }
 
         if (receita.usuario.id != usuarioLogado.id) {
-            throw IllegalStateException("Receita não pertence ao usuário logado")
+            throw BusinessException("Receita não pertence ao usuário logado")
         }
 
         if(!receita.ativo) throw IllegalStateException("Receita já inativa")

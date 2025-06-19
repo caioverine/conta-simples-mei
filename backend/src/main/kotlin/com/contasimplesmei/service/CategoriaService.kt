@@ -2,11 +2,13 @@ package com.contasimplesmei.service
 
 import com.contasimplesmei.dto.CategoriaRequestDTO
 import com.contasimplesmei.dto.CategoriaResponseDTO
+import com.contasimplesmei.exception.BusinessException
 import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.model.Categoria
 import com.contasimplesmei.model.Usuario
 import com.contasimplesmei.repository.CategoriaRepository
 import com.contasimplesmei.security.UsuarioAutenticadoProvider
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -35,6 +37,7 @@ class CategoriaService(
 
     @Transactional
     fun criar(dto: CategoriaRequestDTO): CategoriaResponseDTO {
+        // TODO Validar duplicidade de nome de categoria com BusinessException
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
         val categoria = Categoria(nome = dto.nome, tipo = dto.tipo, usuario = usuarioLogado)
         return repository.save(categoria).toResponseDTO()
@@ -45,10 +48,10 @@ class CategoriaService(
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
         val categoria = repository.findById(id)
-            .orElseThrow { IllegalStateException("Categoria não encontrada para deleção") }
+            .orElseThrow { EntityNotFoundException("Categoria não encontrada para deleção") }
 
         if (categoria.usuario.id != usuarioLogado.id) {
-            throw IllegalStateException("Categoria não pertence ao usuário logado")
+            throw BusinessException("Categoria não pertence ao usuário logado")
         }
 
         if(!categoria.ativo) throw IllegalArgumentException("Categoria já inativa")
@@ -58,7 +61,7 @@ class CategoriaService(
     }
 
     fun buscarPorId(id: UUID): CategoriaResponseDTO =
-        repository.findById(id).orElseThrow { RuntimeException("Categoria não encontrada") }.toResponseDTO()
+        repository.findById(id).orElseThrow { EntityNotFoundException("Categoria não encontrada") }.toResponseDTO()
 
     @Transactional
     fun criarCategoriasPadraoParaUsuario(usuario: Usuario) {
