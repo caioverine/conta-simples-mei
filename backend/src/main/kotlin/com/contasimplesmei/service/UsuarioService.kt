@@ -1,6 +1,7 @@
 package com.contasimplesmei.service
 
 import com.contasimplesmei.dto.UsuarioRequestDTO
+import com.contasimplesmei.exception.BusinessException
 import com.contasimplesmei.mapper.toEntity
 import com.contasimplesmei.model.Usuario
 import com.contasimplesmei.repository.UsuarioRepository
@@ -18,6 +19,10 @@ class UsuarioService(
 
     @Transactional
     fun criar(dto: UsuarioRequestDTO): Usuario {
+        if (repository.existsByEmail(dto.email)) {
+            throw BusinessException("E-mail já cadastrado.")
+        }
+
         val senhaCriptografada = passwordEncoder.encode(dto.senha)
         return repository.save(dto.toEntity(senhaCriptografada))
     }
