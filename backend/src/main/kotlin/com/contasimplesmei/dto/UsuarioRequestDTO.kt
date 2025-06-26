@@ -6,11 +6,9 @@ import jakarta.validation.constraints.Email
 
 data class UsuarioRequestDTO(
     val nome: String,
-
     @field:Email(message = "E-mail inválido")
     val email: String,
-
     @field:SenhaForte
     val senha: String,
-    val perfil: PerfilUsuarioEnum
+    val perfil: PerfilUsuarioEnum,
 )

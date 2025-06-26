@@ -8,8 +8,9 @@ import java.util.UUID
 @Component
 class UsuarioAutenticadoProvider {
     fun getUsuarioLogado(): Usuario {
-        val authentication = SecurityContextHolder.getContext().authentication
-            ?: throw IllegalStateException("Usuário não está autenticado")
+        val authentication =
+            SecurityContextHolder.getContext().authentication
+                ?: throw IllegalStateException("Usuário não está autenticado")
 
         val principal = authentication.principal
         if (principal !is UsuarioPrincipal) {
@@ -19,6 +20,5 @@ class UsuarioAutenticadoProvider {
         return principal.getUsuario()
     }
 
-    fun getIdUsuarioLogado(): UUID =
-        getUsuarioLogado().id ?: throw IllegalStateException("Usuário não possui ID válido")
+    fun getIdUsuarioLogado(): UUID = getUsuarioLogado().id ?: throw IllegalStateException("Usuário não possui ID válido")
 }

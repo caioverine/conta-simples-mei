@@ -4,5 +4,5 @@ import java.math.BigDecimal
 
 data class DespesaPorCategoriaDTO(
     val categoria: CategoriaResponseDTO,
-    val valor: BigDecimal
+    val valor: BigDecimal,
 )

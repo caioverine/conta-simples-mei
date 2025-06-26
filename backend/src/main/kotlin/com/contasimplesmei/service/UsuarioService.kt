@@ -14,9 +14,8 @@ import java.util.UUID
 @Service
 class UsuarioService(
     private val repository: UsuarioRepository,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
 ) {
-
     @Transactional
     fun criar(dto: UsuarioRequestDTO): Usuario {
         if (repository.existsByEmail(dto.email)) {

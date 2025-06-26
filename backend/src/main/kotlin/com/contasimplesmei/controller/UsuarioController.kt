@@ -21,11 +21,12 @@ import java.util.UUID
 @RequestMapping("/usuarios")
 class UsuarioController(
     private val service: UsuarioService,
-    private val categoriaService: CategoriaService
+    private val categoriaService: CategoriaService,
 ) {
-
     @PostMapping
-    fun criar(@RequestBody @Valid dto: UsuarioRequestDTO): ResponseEntity<UsuarioResponseDTO> {
+    fun criar(
+        @RequestBody @Valid dto: UsuarioRequestDTO,
+    ): ResponseEntity<UsuarioResponseDTO> {
         val usuario = service.criar(dto)
         categoriaService.criarCategoriasPadraoParaUsuario(usuario)
         return ResponseEntity.status(HttpStatus.CREATED).body(usuario.toResponseDTO())
@@ -38,14 +39,21 @@ class UsuarioController(
     }
 
     @GetMapping("/{id}")
-    fun buscarPorId(@PathVariable id: UUID): ResponseEntity<UsuarioResponseDTO> {
+    fun buscarPorId(
+        @PathVariable id: UUID,
+    ): ResponseEntity<UsuarioResponseDTO> {
         val usuario = service.buscarPorId(id)
-        return if (usuario != null) ResponseEntity.ok(usuario.toResponseDTO())
-        else ResponseEntity.notFound().build()
+        return if (usuario != null) {
+            ResponseEntity.ok(usuario.toResponseDTO())
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 
     @DeleteMapping("/{id}")
-    fun deletar(@PathVariable id: UUID): ResponseEntity<Void> {
+    fun deletar(
+        @PathVariable id: UUID,
+    ): ResponseEntity<Void> {
         service.deletar(id)
         return ResponseEntity.noContent().build()
     }

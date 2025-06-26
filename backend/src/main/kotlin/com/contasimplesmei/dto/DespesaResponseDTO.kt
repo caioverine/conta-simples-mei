@@ -9,5 +9,5 @@ data class DespesaResponseDTO(
     val categoria: CategoriaResponseDTO,
     val descricao: String,
     val valor: BigDecimal,
-    val data: LocalDate
+    val data: LocalDate,
 )

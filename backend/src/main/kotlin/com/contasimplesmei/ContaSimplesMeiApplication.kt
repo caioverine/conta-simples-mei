@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class ContaSimplesMeiApplication
 
 fun main(args: Array<String>) {
-	runApplication<ContaSimplesMeiApplication>(*args)
+    runApplication<ContaSimplesMeiApplication>(*args)
 }

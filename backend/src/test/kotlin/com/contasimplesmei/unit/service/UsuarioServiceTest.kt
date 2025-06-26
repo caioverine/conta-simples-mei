@@ -19,7 +19,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
 class UsuarioServiceTest {
-
     @Mock
     private lateinit var repository: UsuarioRepository
 
@@ -32,22 +31,24 @@ class UsuarioServiceTest {
     @Test
     fun `deve criar usuario com senha criptografada`() {
         // Arrange
-        val requestDTO = UsuarioRequestDTO(
-            nome = "João",
-            email = "joao@email.com",
-            senha = "SenhaForte123",
-            perfil = PerfilUsuarioEnum.USER
-        )
+        val requestDTO =
+            UsuarioRequestDTO(
+                nome = "João",
+                email = "joao@email.com",
+                senha = "SenhaForte123",
+                perfil = PerfilUsuarioEnum.USER,
+            )
 
         val senhaCriptografada = "criptografada123"
 
-        val usuarioSalvo = Usuario(
-            id = UUID.randomUUID(),
-            nome = "João",
-            email = "joao@email.com",
-            senha = senhaCriptografada,
-            perfil = PerfilUsuarioEnum.USER
-        )
+        val usuarioSalvo =
+            Usuario(
+                id = UUID.randomUUID(),
+                nome = "João",
+                email = "joao@email.com",
+                senha = senhaCriptografada,
+                perfil = PerfilUsuarioEnum.USER,
+            )
 
         whenever(passwordEncoder.encode(requestDTO.senha)).thenReturn(senhaCriptografada)
         whenever(repository.save(any())).thenReturn(usuarioSalvo)

@@ -5,7 +5,6 @@ import com.contasimplesmei.dto.ReceitaResponseDTO
 import com.contasimplesmei.model.Categoria
 import com.contasimplesmei.model.Receita
 import com.contasimplesmei.model.Usuario
-import java.util.UUID
 
 fun Receita.toResponseDTO(): ReceitaResponseDTO =
     ReceitaResponseDTO(
@@ -13,15 +12,18 @@ fun Receita.toResponseDTO(): ReceitaResponseDTO =
         categoria = this.categoria.toResponseDTO(),
         descricao = this.descricao,
         valor = this.valor,
-        data = this.data
+        data = this.data,
     )
 
-fun ReceitaRequestDTO.toEntity(usuarioLogado: Usuario, categoria: Categoria): Receita =
+fun ReceitaRequestDTO.toEntity(
+    usuarioLogado: Usuario,
+    categoria: Categoria,
+): Receita =
     Receita(
         id = null,
         categoria = categoria,
         descricao = this.descricao,
         valor = this.valor,
         data = this.data,
-        usuario = usuarioLogado
+        usuario = usuarioLogado,
     )

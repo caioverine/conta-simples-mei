@@ -12,44 +12,58 @@ import java.util.UUID
 
 interface ReceitaRepository : JpaRepository<Receita, UUID> {
     @Query(
-    "SELECT SUM(r.valor) " +
+        "SELECT SUM(r.valor) " +
             "FROM Receita r " +
             "WHERE r.ativo = true" +
-            " AND r.usuario.id = :idUsuario"
+            " AND r.usuario.id = :idUsuario",
     )
-    fun sumValor(@Param("idUsuario") idUsuario: UUID): BigDecimal?
+    fun sumValor(
+        @Param("idUsuario") idUsuario: UUID,
+    ): BigDecimal?
 
     @Query(
-    "SELECT SUM(r.valor) " +
+        "SELECT SUM(r.valor) " +
             "FROM Receita r " +
             "WHERE MONTH(r.data) = :mes " +
             "AND YEAR(r.data) = :ano " +
             "AND r.ativo = true " +
-            "AND r.usuario.id = :idUsuario"
+            "AND r.usuario.id = :idUsuario",
     )
-    fun sumByMes(@Param("idUsuario") idUsuario: UUID, ano: Int, mes: Int): BigDecimal?
+    fun sumByMes(
+        @Param("idUsuario") idUsuario: UUID,
+        ano: Int,
+        mes: Int,
+    ): BigDecimal?
 
     @Query(
-    "SELECT SUM(r.valor) " +
+        "SELECT SUM(r.valor) " +
             "FROM Receita r" +
             " WHERE MONTH(r.data) = MONTH(CURRENT_DATE)" +
             " AND YEAR(r.data) = YEAR(CURRENT_DATE) " +
             "AND r.ativo = true " +
-            "AND r.usuario.id = :idUsuario"
+            "AND r.usuario.id = :idUsuario",
     )
-    fun sumByMesAtual(@Param("idUsuario") idUsuario: UUID): BigDecimal
+    fun sumByMesAtual(
+        @Param("idUsuario") idUsuario: UUID,
+    ): BigDecimal
 
     fun findTop5ByAtivoTrueAndUsuarioIdOrderByDataDesc(idUsuario: UUID): List<Receita>
 
     @Query(
-    "SELECT r " +
+        "SELECT r " +
             "FROM Receita r " +
             "JOIN FETCH r.categoria " +
             "WHERE r.id = :id " +
             "AND r.ativo = true " +
-            "AND r.usuario.id = :idUsuario"
+            "AND r.usuario.id = :idUsuario",
     )
-    fun findByIdWithCategoria(@Param("id") id: UUID, @Param("idUsuario") idUsuario: UUID): Optional<Receita>
+    fun findByIdWithCategoria(
+        @Param("id") id: UUID,
+        @Param("idUsuario") idUsuario: UUID,
+    ): Optional<Receita>
 
-    fun findAllByAtivoTrueAndUsuarioId(pageable: Pageable, idUsuario: UUID): Page<Receita>
+    fun findAllByAtivoTrueAndUsuarioId(
+        pageable: Pageable,
+        idUsuario: UUID,
+    ): Page<Receita>
 }

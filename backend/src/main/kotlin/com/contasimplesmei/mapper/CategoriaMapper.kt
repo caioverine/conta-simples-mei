@@ -9,7 +9,7 @@ fun Categoria.toResponseDTO(): CategoriaResponseDTO =
     CategoriaResponseDTO(
         id = this.id!!,
         nome = this.nome!!,
-        tipo = this.tipo!!
+        tipo = this.tipo!!,
     )
 
 fun CategoriaRequestDTO.toEntity(usuarioLogado: Usuario): Categoria =
@@ -17,5 +17,5 @@ fun CategoriaRequestDTO.toEntity(usuarioLogado: Usuario): Categoria =
         id = null,
         nome = this.nome,
         tipo = this.tipo,
-        usuario = usuarioLogado
+        usuario = usuarioLogado,
     )

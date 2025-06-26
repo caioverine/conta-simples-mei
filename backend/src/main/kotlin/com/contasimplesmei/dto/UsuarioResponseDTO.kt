@@ -7,5 +7,5 @@ data class UsuarioResponseDTO(
     val id: UUID,
     val nome: String,
     val email: String,
-    val perfil: PerfilUsuarioEnum
+    val perfil: PerfilUsuarioEnum,
 )

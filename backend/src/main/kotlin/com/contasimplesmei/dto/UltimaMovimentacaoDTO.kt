@@ -8,5 +8,5 @@ data class UltimaMovimentacaoDTO(
     val valor: BigDecimal,
     val descricao: String,
     val categoria: String,
-    val tipo: String
+    val tipo: String,
 )

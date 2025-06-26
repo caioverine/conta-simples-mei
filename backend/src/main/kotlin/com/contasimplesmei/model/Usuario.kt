@@ -17,17 +17,13 @@ data class Usuario(
     @Id
     @GeneratedValue
     val id: UUID? = null,
-
     @Column(nullable = false)
     val nome: String,
-
     @Column(nullable = false, unique = true)
     val email: String,
-
     @Column(nullable = false)
     val senha: String,
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val perfil: PerfilUsuarioEnum
+    val perfil: PerfilUsuarioEnum,
 )

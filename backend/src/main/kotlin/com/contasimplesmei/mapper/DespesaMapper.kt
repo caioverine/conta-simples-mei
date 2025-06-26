@@ -12,15 +12,18 @@ fun Despesa.toResponseDTO(): DespesaResponseDTO =
         categoria = this.categoria.toResponseDTO(),
         descricao = this.descricao,
         valor = this.valor,
-        data = this.data
+        data = this.data,
     )
 
-fun DespesaRequestDTO.toEntity(usuarioLogado: Usuario, categoria: Categoria): Despesa =
+fun DespesaRequestDTO.toEntity(
+    usuarioLogado: Usuario,
+    categoria: Categoria,
+): Despesa =
     Despesa(
         id = null,
         categoria = categoria,
         descricao = this.descricao,
         valor = this.valor,
         data = this.data,
-        usuario = usuarioLogado
+        usuario = usuarioLogado,
     )

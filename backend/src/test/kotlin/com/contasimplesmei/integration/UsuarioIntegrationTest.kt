@@ -29,11 +29,12 @@ class UsuarioIntegrationTest {
 
     @Test
     fun `deve criar usuario com sucesso via endpoint POST usuarios`() {
-        val novoUsuario = mapOf(
-            "nome" to "Maria",
-            "email" to "maria@email.com",
-            "senha" to "SenhaSegura456"
-        )
+        val novoUsuario =
+            mapOf(
+                "nome" to "Maria",
+                "email" to "maria@email.com",
+                "senha" to "SenhaSegura456",
+            )
 
         mockMvc.post("/usuarios") {
             contentType = MediaType.APPLICATION_JSON

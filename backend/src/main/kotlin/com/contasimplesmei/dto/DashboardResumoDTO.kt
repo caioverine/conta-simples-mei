@@ -6,5 +6,5 @@ data class DashboardResumoDTO(
     val saldoAtual: BigDecimal,
     val receitaTotal: BigDecimal,
     val despesaTotal: BigDecimal,
-    val resultadoMensal: BigDecimal
+    val resultadoMensal: BigDecimal,
 )

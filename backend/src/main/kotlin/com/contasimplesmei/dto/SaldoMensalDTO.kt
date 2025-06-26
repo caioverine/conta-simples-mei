@@ -4,5 +4,5 @@ import java.math.BigDecimal
 
 data class SaldoMensalDTO(
     val mes: String,
-    val saldo: BigDecimal
+    val saldo: BigDecimal,
 )

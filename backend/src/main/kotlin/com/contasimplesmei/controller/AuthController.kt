@@ -17,16 +17,18 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(
     private val authenticationManager: AuthenticationManager,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val usuarioRepository: UsuarioRepository
+    private val usuarioRepository: UsuarioRepository,
 ) {
-
     @PostMapping("/login")
-    fun login(@RequestBody request: AuthRequestDTO): ResponseEntity<AuthResponseDTO> {
+    fun login(
+        @RequestBody request: AuthRequestDTO,
+    ): ResponseEntity<AuthResponseDTO> {
         val authenticationToken = UsernamePasswordAuthenticationToken(request.email, request.senha)
         authenticationManager.authenticate(authenticationToken)
 
-        val usuario = usuarioRepository.findByEmail(request.email)
-            ?: return ResponseEntity.badRequest().build()
+        val usuario =
+            usuarioRepository.findByEmail(request.email)
+                ?: return ResponseEntity.badRequest().build()
 
         val token = jwtTokenProvider.gerarToken(usuario.email)
 
@@ -34,8 +36,8 @@ class AuthController(
             AuthResponseDTO(
                 token = token,
                 nome = usuario.nome,
-                email = usuario.email
-            )
+                email = usuario.email,
+            ),
         )
     }
 }

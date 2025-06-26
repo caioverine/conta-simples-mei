@@ -2,7 +2,6 @@ package com.contasimplesmei.controller
 
 import com.contasimplesmei.dto.DespesaRequestDTO
 import com.contasimplesmei.dto.DespesaResponseDTO
-import com.contasimplesmei.mapper.toResponseDTO
 import com.contasimplesmei.service.DespesaService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -22,39 +21,54 @@ import java.util.UUID
 @RestController
 @RequestMapping("/despesas")
 class DespesaController(
-    private val service: DespesaService
+    private val service: DespesaService,
 ) {
     @GetMapping
     fun listarDespesas(
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "10") size: Int
+        @RequestParam(defaultValue = "10") size: Int,
     ): ResponseEntity<Page<DespesaResponseDTO>> {
         val despesas = service.listarDespesasPaginadas(page, size)
         return ResponseEntity.ok(despesas)
     }
 
     @GetMapping("/{id}")
-    fun buscarPorId(@PathVariable id: UUID): ResponseEntity<DespesaResponseDTO> {
+    fun buscarPorId(
+        @PathVariable id: UUID,
+    ): ResponseEntity<DespesaResponseDTO> {
         val despesa = service.buscarPorId(id)
-        return if (despesa != null) ResponseEntity.ok(despesa)
-        else ResponseEntity.notFound().build()
+        return if (despesa != null) {
+            ResponseEntity.ok(despesa)
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 
     @PostMapping
-    fun criar(@RequestBody @Valid dto: DespesaRequestDTO): ResponseEntity<DespesaResponseDTO> {
+    fun criar(
+        @RequestBody @Valid dto: DespesaRequestDTO,
+    ): ResponseEntity<DespesaResponseDTO> {
         val despesa = service.criar(dto)
         return ResponseEntity.status(HttpStatus.CREATED).body(despesa)
     }
 
     @PutMapping("/{id}")
-    fun atualizar(@PathVariable id: UUID, @RequestBody dto: DespesaRequestDTO): ResponseEntity<DespesaResponseDTO> {
+    fun atualizar(
+        @PathVariable id: UUID,
+        @RequestBody dto: DespesaRequestDTO,
+    ): ResponseEntity<DespesaResponseDTO> {
         val despesa = service.atualizar(id, dto)
-        return if (despesa != null) ResponseEntity.ok(despesa)
-        else ResponseEntity.notFound().build()
+        return if (despesa != null) {
+            ResponseEntity.ok(despesa)
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 
     @DeleteMapping("/{id}")
-    fun deletar(@PathVariable id: UUID): ResponseEntity<Void> {
+    fun deletar(
+        @PathVariable id: UUID,
+    ): ResponseEntity<Void> {
         service.deletar(id)
         return ResponseEntity.noContent().build()
     }

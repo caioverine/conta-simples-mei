@@ -10,5 +10,5 @@ data class ReceitaRequestDTO(
     @field:NotNull val idCategoria: UUID,
     @field:NotBlank val descricao: String,
     @field:NotNull val valor: BigDecimal,
-    @field:NotNull val data: LocalDate
+    @field:NotNull val data: LocalDate,
 )

@@ -10,7 +10,7 @@ fun UsuarioRequestDTO.toEntity(senhaCriptografada: String): Usuario =
         nome = this.nome,
         email = this.email,
         senha = senhaCriptografada,
-        perfil = this.perfil
+        perfil = this.perfil,
     )
 
 fun Usuario.toResponseDTO(): UsuarioResponseDTO =
@@ -18,5 +18,5 @@ fun Usuario.toResponseDTO(): UsuarioResponseDTO =
         id = this.id!!,
         nome = this.nome,
         email = this.email,
-        perfil = this.perfil
+        perfil = this.perfil,
     )

@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import java.util.UUID
 
 class UsuarioPrincipal(
-    private val usuario: Usuario
+    private val usuario: Usuario,
 ) : UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> = emptyList()
 

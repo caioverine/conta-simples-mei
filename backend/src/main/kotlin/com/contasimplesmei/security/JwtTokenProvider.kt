@@ -12,7 +12,6 @@ private const val VALIDITY_IN_MS = 3600000
 
 @Component
 class JwtTokenProvider {
-
     private val secretKey: SecretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
 
     fun gerarToken(email: String): String {

@@ -20,9 +20,12 @@ import java.util.*
 class DespesaService(
     private val usuarioAutenticadoProvider: UsuarioAutenticadoProvider,
     private val repository: DespesaRepository,
-    private val categoriaRepository: CategoriaRepository
+    private val categoriaRepository: CategoriaRepository,
 ) {
-    fun listarDespesasPaginadas(page: Int, size: Int): Page<DespesaResponseDTO> {
+    fun listarDespesasPaginadas(
+        page: Int,
+        size: Int,
+    ): Page<DespesaResponseDTO> {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
         val pageable = PageRequest.of(page, size, Sort.by("data").descending())
         return repository.findAllByAtivoTrueAndUsuarioId(pageable, usuarioLogado.id!!).map { it.toResponseDTO() }
@@ -38,28 +41,34 @@ class DespesaService(
         val categoria = categoriaRepository.findByIdAndUsuarioId(dto.idCategoria, usuarioLogado.id!!)
 
         val despesSalva = repository.save(dto.toEntity(usuarioLogado, categoria))
-        val despesaCompleta = repository.findByIdWithCategoria(despesSalva.id!!, usuarioLogado.id!!)
-            .orElseThrow { EntityNotFoundException("Despesa não encontrada após o save") }
+        val despesaCompleta =
+            repository.findByIdWithCategoria(despesSalva.id!!, usuarioLogado.id!!)
+                .orElseThrow { EntityNotFoundException("Despesa não encontrada após o save") }
         return despesaCompleta.toResponseDTO()
     }
 
     @Transactional
-    fun atualizar(id: UUID, dto: DespesaRequestDTO): DespesaResponseDTO? {
+    fun atualizar(
+        id: UUID,
+        dto: DespesaRequestDTO,
+    ): DespesaResponseDTO? {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
-        val despesa = repository.findById(id)
-            .orElse(null)
-            ?.takeIf { it.usuario.id == usuarioLogado.id }
-            ?: throw EntityNotFoundException("Despesa não encontrada ou não pertence ao usuário logado")
+        val despesa =
+            repository.findById(id)
+                .orElse(null)
+                ?.takeIf { it.usuario.id == usuarioLogado.id }
+                ?: throw EntityNotFoundException("Despesa não encontrada ou não pertence ao usuário logado")
 
         val categoria = categoriaRepository.findByIdAndUsuarioId(dto.idCategoria, usuarioLogado.id!!)
 
-        val despesaAtualizada = despesa.copy(
-            descricao = dto.descricao,
-            valor = dto.valor,
-            data = dto.data,
-            categoria = categoria
-        )
+        val despesaAtualizada =
+            despesa.copy(
+                descricao = dto.descricao,
+                valor = dto.valor,
+                data = dto.data,
+                categoria = categoria,
+            )
 
         return repository.save(despesaAtualizada).toResponseDTO()
     }
@@ -68,8 +77,9 @@ class DespesaService(
     fun deletar(id: UUID) {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
-        val despesa = repository.findById(id)
-            .orElseThrow { EntityNotFoundException("Despesa não encontrada para deleção") }
+        val despesa =
+            repository.findById(id)
+                .orElseThrow { EntityNotFoundException("Despesa não encontrada para deleção") }
 
         if (despesa.usuario.id != usuarioLogado.id) {
             throw BusinessException("Despesa não pertence ao usuário logado")

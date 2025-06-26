@@ -12,21 +12,17 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/dashboard")
 class DashboardController(
-    private val dashboardService: DashboardService
+    private val dashboardService: DashboardService,
 ) {
     @GetMapping("/resumo")
-    fun getResumoFinanceiro(): DashboardResumoDTO =
-        dashboardService.obterResumoFinanceiro()
+    fun getResumoFinanceiro(): DashboardResumoDTO = dashboardService.obterResumoFinanceiro()
 
     @GetMapping("/saldo-mensal")
-    fun getEvolucaoSaldo(): List<SaldoMensalDTO> =
-        dashboardService.obterEvolucaoSaldoMensal()
+    fun getEvolucaoSaldo(): List<SaldoMensalDTO> = dashboardService.obterEvolucaoSaldoMensal()
 
     @GetMapping("/despesas-categoria")
-    fun getDespesasPorCategoria(): List<DespesaPorCategoriaDTO> =
-        dashboardService.obterDespesasPorCategoria()
+    fun getDespesasPorCategoria(): List<DespesaPorCategoriaDTO> = dashboardService.obterDespesasPorCategoria()
 
     @GetMapping("/ultimas-movimentacoes")
-    fun getUltimasMovimentacoes(): List<UltimaMovimentacaoDTO> =
-        dashboardService.obterUltimasMovimentacoes()
+    fun getUltimasMovimentacoes(): List<UltimaMovimentacaoDTO> = dashboardService.obterUltimasMovimentacoes()
 }
