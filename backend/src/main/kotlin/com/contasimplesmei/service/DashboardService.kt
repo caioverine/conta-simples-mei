@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.YearMonth
 
+private const val QTD_MESES_EVOLUCAO_SALDO_MENSAL = 3
+private const val QTD_REGISTROS_ULTIMAS_MOVIMENTACOES = 5
+
 @Service
 class DashboardService(
     private val usuarioAutenticadoProvider: UsuarioAutenticadoProvider,
@@ -23,7 +26,10 @@ class DashboardService(
         val totalReceitas = receitaRepository.sumValor(usuarioLogado.id!!) ?: BigDecimal.ZERO
         val totalDespesas = despesaRepository.sumValor(usuarioLogado.id!!) ?: BigDecimal.ZERO
         val saldoAtual = totalReceitas - totalDespesas
-        val resultadoMensal = receitaRepository.sumByMesAtual(usuarioLogado.id!!) - despesaRepository.sumByMesAtual(usuarioLogado.id!!)
+        val resultadoMensal =
+            receitaRepository.sumByMesAtual(usuarioLogado.id!!)
+            -
+            despesaRepository.sumByMesAtual(usuarioLogado.id!!)
 
         return DashboardResumoDTO(
             saldoAtual = saldoAtual,
@@ -35,7 +41,7 @@ class DashboardService(
 
     fun obterEvolucaoSaldoMensal(): List<SaldoMensalDTO> {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
-        val meses = gerarUltimosMeses(3)
+        val meses = gerarUltimosMeses(QTD_MESES_EVOLUCAO_SALDO_MENSAL)
         val resultado = mutableListOf<SaldoMensalDTO>()
         var saldoAcumulado = BigDecimal.ZERO
 
@@ -87,7 +93,7 @@ class DashboardService(
 
         return (receitas + despesas)
             .sortedByDescending { it.data }
-            .take(5)
+            .take(QTD_REGISTROS_ULTIMAS_MOVIMENTACOES)
     }
 
     private fun gerarUltimosMeses(qtd: Int): List<YearMonth> {

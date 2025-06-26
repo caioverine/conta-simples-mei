@@ -19,5 +19,6 @@ class UsuarioAutenticadoProvider {
         return principal.getUsuario()
     }
 
-    fun getIdUsuarioLogado(): UUID = getUsuarioLogado().id ?: throw IllegalStateException("Usuário não possui ID válido")
+    fun getIdUsuarioLogado(): UUID =
+        getUsuarioLogado().id ?: throw IllegalStateException("Usuário não possui ID válido")
 }

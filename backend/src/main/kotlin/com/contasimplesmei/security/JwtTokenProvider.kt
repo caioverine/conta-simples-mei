@@ -8,15 +8,16 @@ import org.springframework.stereotype.Component
 import java.util.Date
 import javax.crypto.SecretKey
 
+private const val VALIDITY_IN_MS = 3600000
+
 @Component
 class JwtTokenProvider {
 
     private val secretKey: SecretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
-    private val validityInMs: Long = 3600000
 
     fun gerarToken(email: String): String {
         val now = Date()
-        val validity = Date(now.time + validityInMs)
+        val validity = Date(now.time + VALIDITY_IN_MS)
 
         return Jwts.builder()
             .setSubject(email)

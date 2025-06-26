@@ -13,7 +13,9 @@ import java.time.LocalDateTime
 class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleValidationExceptions(ex: MethodArgumentNotValidException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+    fun handleValidationExceptions(
+        ex: MethodArgumentNotValidException, request: HttpServletRequest
+    ): ResponseEntity<ErrorResponse> {
         val errors = ex.bindingResult.fieldErrors.map { "${it.field}: ${it.defaultMessage}" }
         val response = ErrorResponse(
             timestamp = LocalDateTime.now(),
@@ -50,7 +52,9 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException::class)
-    fun handleEntityNotFoundException(ex: EntityNotFoundException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+    fun handleEntityNotFoundException(
+        ex: EntityNotFoundException, request: HttpServletRequest
+    ): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(
             timestamp = LocalDateTime.now(),
             status = HttpStatus.NOT_FOUND.value(),
@@ -62,7 +66,9 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalStateException::class)
-    fun handleIllegalStateException(ex: IllegalStateException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+    fun handleIllegalStateException(
+        ex: IllegalStateException, request: HttpServletRequest
+    ): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(
             timestamp = LocalDateTime.now(),
             status = HttpStatus.CONFLICT.value(),

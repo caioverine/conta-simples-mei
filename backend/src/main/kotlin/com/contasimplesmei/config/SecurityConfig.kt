@@ -1,6 +1,5 @@
 package com.contasimplesmei.config
 
-import com.contasimplesmei.security.CustomUserDetailsService
 import com.contasimplesmei.security.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,8 +18,7 @@ import org.springframework.web.filter.CorsFilter
 
 @Configuration
 class SecurityConfig(
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
-    private val userDetailsService: CustomUserDetailsService
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter
 ) {
 
     @Bean

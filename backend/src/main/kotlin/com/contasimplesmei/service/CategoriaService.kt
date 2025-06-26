@@ -32,7 +32,11 @@ class CategoriaService(
             throw IllegalArgumentException("Tipo de categoria inválido: $tipo. Use RECEITA ou DESPESA.")
         }
 
-        return repository.findAllByTipoAndAtivoTrueAndUsuarioId(tipoCategoria, usuarioLogado.id!!).map { it.toResponseDTO() }
+        return repository.findAllByTipoAndAtivoTrueAndUsuarioId(
+            tipoCategoria,
+            usuarioLogado.id!!
+        )
+        .map { it.toResponseDTO() }
     }
 
     @Transactional
