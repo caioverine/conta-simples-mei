@@ -1,0 +1,36 @@
+name: CI - Build and Quality Check
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout do código
+        uses: actions/checkout@v4
+
+      - name: ☕ Instalação do JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: ⚙️ Permissão ao Gradle
+        run: chmod +x gradlew
+
+      - name: 🧪 Rodar testes
+        run: ./gradlew test
+
+      - name: 🧹 Validar código com ktlint
+        run: ./gradlew ktlintCheck
+
+      - name: 🔍 Análise estática com detekt
+        run: ./gradlew detekt
+
+      - name: ✅ Build da aplicação
+        run: ./gradlew build
