@@ -19,23 +19,23 @@ private const val QTD_REGISTROS_ULTIMAS_MOVIMENTACOES = 5
 class DashboardService(
     private val usuarioAutenticadoProvider: UsuarioAutenticadoProvider,
     private val receitaRepository: ReceitaRepository,
-    private val despesaRepository: DespesaRepository
+    private val despesaRepository: DespesaRepository,
 ) {
     fun obterResumoFinanceiro(): DashboardResumoDTO {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
         val totalReceitas = receitaRepository.sumValor(usuarioLogado.id!!) ?: BigDecimal.ZERO
         val totalDespesas = despesaRepository.sumValor(usuarioLogado.id!!) ?: BigDecimal.ZERO
         val saldoAtual = totalReceitas - totalDespesas
-        val resultadoMensal =
-            receitaRepository.sumByMesAtual(usuarioLogado.id!!)
-            -
-            despesaRepository.sumByMesAtual(usuarioLogado.id!!)
+
+        val somaReceitasMesAtual = this.receitaRepository.sumByMesAtual(usuarioLogado.id!!)
+        val somaDespesasMesAtual = this.despesaRepository.sumByMesAtual(usuarioLogado.id!!)
+        val resultadoMensal = somaReceitasMesAtual - somaDespesasMesAtual
 
         return DashboardResumoDTO(
             saldoAtual = saldoAtual,
             receitaTotal = totalReceitas,
             despesaTotal = totalDespesas,
-            resultadoMensal = resultadoMensal
+            resultadoMensal = resultadoMensal,
         )
     }
 
@@ -58,38 +58,43 @@ class DashboardService(
 
     fun obterDespesasPorCategoria(): List<DespesaPorCategoriaDTO> {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
-        return despesaRepository.sumGroupByCategoria(usuarioLogado.id!!)
+        return despesaRepository
+            .sumGroupByCategoria(usuarioLogado.id!!)
             .map {
                 DespesaPorCategoriaDTO(
                     categoria = it.categoria.toResponseDTO(),
-                    valor = it.total
+                    valor = it.total,
                 )
             }
     }
 
     fun obterUltimasMovimentacoes(): List<UltimaMovimentacaoDTO> {
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
-        val receitas = receitaRepository.findTop5ByAtivoTrueAndUsuarioIdOrderByDataDesc(usuarioLogado.id!!)
-            .map {
-                UltimaMovimentacaoDTO(
-                    data = it.data,
-                    valor = it.valor,
-                    descricao = it.descricao,
-                    categoria = it.categoria.nome!!,
-                    tipo = "Receita"
-                )
-            }
+        val receitas =
+            receitaRepository
+                .findTop5ByAtivoTrueAndUsuarioIdOrderByDataDesc(usuarioLogado.id!!)
+                .map {
+                    UltimaMovimentacaoDTO(
+                        data = it.data,
+                        valor = it.valor,
+                        descricao = it.descricao,
+                        categoria = it.categoria.nome!!,
+                        tipo = "Receita",
+                    )
+                }
 
-        val despesas = despesaRepository.findTop5ByAtivoTrueAndUsuarioIdOrderByDataDesc(usuarioLogado.id!!)
-            .map {
-                UltimaMovimentacaoDTO(
-                    data = it.data,
-                    valor = it.valor.negate(),
-                    descricao = it.descricao,
-                    categoria = it.categoria.nome!!,
-                    tipo = "Despesa"
-                )
-            }
+        val despesas =
+            despesaRepository
+                .findTop5ByAtivoTrueAndUsuarioIdOrderByDataDesc(usuarioLogado.id!!)
+                .map {
+                    UltimaMovimentacaoDTO(
+                        data = it.data,
+                        valor = it.valor.negate(),
+                        descricao = it.descricao,
+                        categoria = it.categoria.nome!!,
+                        tipo = "Despesa",
+                    )
+                }
 
         return (receitas + despesas)
             .sortedByDescending { it.data }
