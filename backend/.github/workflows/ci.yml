@@ -1,4 +1,4 @@
-name: CI - Build and Quality Check
+name: CI - Pipeline
 
 on:
   push:
@@ -7,30 +7,83 @@ on:
     branches: [ "main", "dev" ]
 
 jobs:
-  build:
+  test-backend:
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Checkout do código
+      - name: Code checkout
         uses: actions/checkout@v4
 
-      - name: ☕ Instalação do JDK 17
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
 
-      - name: ⚙️ Permissão ao Gradle
+      - name: Gradle permission
         run: chmod +x gradlew
 
-      - name: 🧪 Rodar testes
+      - name: Run backend tests
+        working-directory: ./backend
         run: ./gradlew test
 
-      - name: 🧹 Validar código com ktlint
+      - name: Run backend linting
+        working-directory: ./backend
         run: ./gradlew ktlintCheck
 
-      - name: 🔍 Análise estática com detekt
+      - name: Run backend detekt
+        working-directory: ./backend
         run: ./gradlew detekt
 
-      - name: ✅ Build da aplicação
+      - name: Build backend
+        working-directory: ./backend
         run: ./gradlew build
+
+  test-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run linting
+        working-directory: ./frontend
+        run: npm run lint
+
+#     SEM TESTES NO FRONTEND POR ENQUANTO
+#      - name: Run tests
+#        working-directory: ./frontend
+#        run: npm run test
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
