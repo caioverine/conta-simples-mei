@@ -17,3 +17,6 @@ spring:
   logging:
     level:
       org.springframework: DEBUG
+  messages:
+    basename: messages
+    encoding: UTF-8

@@ -9,15 +9,18 @@ import com.contasimplesmei.repository.CategoriaRepository
 import com.contasimplesmei.repository.ReceitaRepository
 import com.contasimplesmei.security.UsuarioAutenticadoProvider
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
+import java.util.UUID
 
 @Service
 class ReceitaService(
+    private val messageSource: MessageSource,
     private val usuarioAutenticadoProvider: UsuarioAutenticadoProvider,
     private val repository: ReceitaRepository,
     private val categoriaRepository: CategoriaRepository,
@@ -32,7 +35,13 @@ class ReceitaService(
     }
 
     fun buscarPorId(id: UUID): ReceitaResponseDTO? =
-        repository.findById(id).orElseThrow { EntityNotFoundException("Receita não encontrada") }.toResponseDTO()
+        repository.findById(id).orElseThrow { EntityNotFoundException(
+            messageSource.getMessage(
+                "receita.nao.encontrada",
+                null,
+                LocaleContextHolder.getLocale(),
+            )
+        ) }.toResponseDTO()
 
     @Transactional
     fun criar(dto: ReceitaRequestDTO): ReceitaResponseDTO {
@@ -42,8 +51,15 @@ class ReceitaService(
 
         val receitaSalva = repository.save(dto.toEntity(usuarioLogado, categoria))
         val receitaCompleta =
-            repository.findByIdWithCategoria(receitaSalva.id!!, usuarioLogado.id!!)
-                .orElseThrow { EntityNotFoundException("Receita não encontrada após o save") }
+            repository
+                .findByIdWithCategoria(receitaSalva.id!!, usuarioLogado.id!!)
+                .orElseThrow { EntityNotFoundException(
+                    messageSource.getMessage(
+                        "receita.nao.encontrada",
+                        null,
+                        LocaleContextHolder.getLocale(),
+                    )
+                ) }
         return receitaCompleta.toResponseDTO()
     }
 
@@ -55,10 +71,17 @@ class ReceitaService(
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
         val receita =
-            repository.findById(id)
+            repository
+                .findById(id)
                 .orElse(null)
                 ?.takeIf { it.usuario.id == usuarioLogado.id }
-                ?: throw EntityNotFoundException("Receita não encontrada ou não pertence ao usuário logado")
+                ?: throw EntityNotFoundException(
+                    messageSource.getMessage(
+                        "receita.nao.encontrada",
+                        null,
+                        LocaleContextHolder.getLocale(),
+                    )
+                )
 
         val categoria = categoriaRepository.findByIdAndUsuarioId(dto.idCategoria, usuarioLogado.id!!)
 
@@ -78,14 +101,33 @@ class ReceitaService(
         val usuarioLogado = usuarioAutenticadoProvider.getUsuarioLogado()
 
         val receita =
-            repository.findById(id)
-                .orElseThrow { EntityNotFoundException("Receita não encontrada para deleção") }
+            repository
+                .findById(id)
+                .orElseThrow { EntityNotFoundException(
+                    messageSource.getMessage(
+                        "receita.nao.encontrada",
+                        null,
+                        LocaleContextHolder.getLocale(),
+                    )
+                ) }
 
         if (receita.usuario.id != usuarioLogado.id) {
-            throw BusinessException("Receita não pertence ao usuário logado")
+            throw BusinessException(
+                messageSource.getMessage(
+                    "receita.pertence.outro.usuario",
+                    null,
+                    LocaleContextHolder.getLocale(),
+                )
+            )
         }
 
-        if (!receita.ativo) throw IllegalStateException("Receita já inativa")
+        if (!receita.ativo) throw BusinessException(
+            messageSource.getMessage(
+                "receita.inativa",
+                null,
+                LocaleContextHolder.getLocale(),
+            )
+        )
 
         val receitaInativa = receita.copy(ativo = false)
         repository.save(receitaInativa)

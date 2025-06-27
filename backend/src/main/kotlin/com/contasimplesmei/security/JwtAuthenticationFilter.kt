@@ -10,6 +10,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
+private const val START_INDEX_HADER_SUBSTRING = 7
+
 @Component
 class JwtAuthenticationFilter(
     private val jwtTokenProvider: JwtTokenProvider,
@@ -23,7 +25,7 @@ class JwtAuthenticationFilter(
         val header = request.getHeader("Authorization")
 
         if (header != null && header.startsWith("Bearer ")) {
-            val token = header.substring(7)
+            val token = header.substring(START_INDEX_HADER_SUBSTRING)
             if (jwtTokenProvider.tokenValido(token)) {
                 val email = jwtTokenProvider.getEmailDoToken(token)
                 val userDetails = userDetailsService.loadUserByUsername(email)

@@ -5,4 +5,7 @@ spring:
     serialization:
       INDENT_OUTPUT: true
   profiles:
-    active: dev # pode ser sobrescrito via docker
+    active: dev
+  messages:
+    basename: messages
+    encoding: UTF-8

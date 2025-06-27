@@ -9,12 +9,15 @@ import com.contasimplesmei.model.Usuario
 import com.contasimplesmei.repository.CategoriaRepository
 import com.contasimplesmei.security.UsuarioAutenticadoProvider
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
 class CategoriaService(
+    private val messageSource: MessageSource,
     private val usuarioAutenticadoProvider: UsuarioAutenticadoProvider,
     private val repository: CategoriaRepository,
 ) {
@@ -29,7 +32,13 @@ class CategoriaService(
             runCatching {
                 tipo.uppercase()
             }.getOrElse {
-                throw IllegalArgumentException("Tipo de categoria inválido: $tipo. Use RECEITA ou DESPESA.")
+                throw IllegalArgumentException(
+                    messageSource.getMessage(
+                        "tipo.categoria.invalido",
+                        null,
+                        LocaleContextHolder.getLocale(),
+                    )
+                )
             }
 
         return repository
@@ -54,13 +63,29 @@ class CategoriaService(
         val categoria =
             repository
                 .findById(id)
-                .orElseThrow { EntityNotFoundException("Categoria não encontrada para deleção") }
+                .orElseThrow { EntityNotFoundException(
+                    messageSource.getMessage(
+                        "categoria.nao.encontrada",
+                        null,
+                        LocaleContextHolder.getLocale(),
+                    )
+                ) }
 
         if (categoria.usuario.id != usuarioLogado.id) {
-            throw BusinessException("Categoria não pertence ao usuário logado")
+            throw BusinessException(messageSource.getMessage(
+                "categoria.nao.pertence.usuario.logado",
+                null,
+                LocaleContextHolder.getLocale(),
+            ))
         }
 
-        if (!categoria.ativo) throw IllegalArgumentException("Categoria já inativa")
+        if (!categoria.ativo) throw BusinessException(
+            messageSource.getMessage(
+                "categoria.inativa",
+                null,
+                LocaleContextHolder.getLocale(),
+            )
+        )
 
         val categoriaInativa = categoria.copy(ativo = false)
         repository.save(categoriaInativa)

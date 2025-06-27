@@ -10,3 +10,6 @@ spring:
   logging:
     level:
       org.springframework: INFO
+  messages:
+    basename: messages
+    encoding: UTF-8

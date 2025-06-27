@@ -13,7 +13,9 @@ spring:
       max-request-size: 10MB
   main:
     banner-mode: off
-
-logging:
-  level:
-    org.springframework: WARN
+  logging:
+    level:
+      org.springframework: WARN
+  messages:
+    basename: messages
+    encoding: UTF-8

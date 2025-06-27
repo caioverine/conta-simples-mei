@@ -6,5 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 class ContaSimplesMeiApplicationTests {
     @Test
-    fun contextLoads() {}
+    fun contextLoads() {
+        assert(true)
+    }
 }

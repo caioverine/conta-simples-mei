@@ -33,11 +33,9 @@ class SecurityConfig(
                 it.requestMatchers("/swagger-ui/**").permitAll()
                 it.requestMatchers("/swagger-ui.html").permitAll()
                 it.anyRequest().authenticated()
-            }
-            .sessionManagement {
+            }.sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            }
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            }.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .httpBasic { }
 
         return http.build()
@@ -62,5 +60,7 @@ class SecurityConfig(
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
-    fun authenticationManager(configuration: AuthenticationConfiguration): AuthenticationManager = configuration.authenticationManager
+    fun authenticationManager(
+        configuration: AuthenticationConfiguration
+    ): AuthenticationManager = configuration.authenticationManager
 }
