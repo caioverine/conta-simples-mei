@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import kotlin.test.assertEquals
 
 @SpringBootTest(classes = [ContaSimplesMeiApplication::class])
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class UsuarioIntegrationTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -33,17 +35,19 @@ class UsuarioIntegrationTest {
             mapOf(
                 "nome" to "Maria",
                 "email" to "maria@email.com",
-                "senha" to "SenhaSegura456",
+                "senha" to "SenhaSegura456@",
+                "perfil" to "USER",
             )
 
-        mockMvc.post("/usuarios") {
-            contentType = MediaType.APPLICATION_JSON
-            content = ObjectMapper().writeValueAsString(novoUsuario)
-        }.andExpect {
-            status { isCreated() }
-            jsonPath("$.nome") { value("Maria") }
-            jsonPath("$.email") { value("maria@email.com") }
-        }
+        mockMvc
+            .post("/usuarios") {
+                contentType = MediaType.APPLICATION_JSON
+                content = ObjectMapper().writeValueAsString(novoUsuario)
+            }.andExpect {
+                status { isCreated() }
+                jsonPath("$.nome") { value("Maria") }
+                jsonPath("$.email") { value("maria@email.com") }
+            }
 
         // Verifica no banco
         val usuarios = repository.findAll()
