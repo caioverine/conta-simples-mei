@@ -7,14 +7,15 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: false
   sql:
     init:
-      mode: always
-      platform: h2
+      mode: never
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
 logging:
   level:
