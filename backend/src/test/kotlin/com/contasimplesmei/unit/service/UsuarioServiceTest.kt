@@ -49,8 +49,9 @@ class UsuarioServiceTest {
             perfil = PerfilUsuarioEnum.USER
         )
 
+        whenever(repository.existsByEmail(requestDTO.email)).thenReturn(false)
         whenever(passwordEncoder.encode(requestDTO.senha)).thenReturn(senhaCriptografada)
-        whenever(repository.save(any())).thenReturn(usuarioSalvo)
+        whenever(repository.save(any<Usuario>())).thenReturn(usuarioSalvo)
 
         // Act
         val result = usuarioService.criar(requestDTO)
