@@ -1,12 +1,12 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard/Dashboard";
-import { useAuth } from "../contexts/AuthContext";
 import Layout from "../components/Layout";
 import Receitas from "../pages/Receitas/Receitas";
 import CadastroUsuario from "../pages/CadastroUsuario";
 import Despesas from "../pages/Despesas/Despesas";
 import Categorias from "../pages/Categorias/Categorias";
+import { useAuth } from "../contexts/useAuth";
 
 export default function AppRoutes() {
   const { isAuthenticated, loadingAuth } = useAuth();

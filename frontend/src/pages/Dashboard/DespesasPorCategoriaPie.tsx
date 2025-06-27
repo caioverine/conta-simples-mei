@@ -27,7 +27,7 @@ export default function DespesasPorCategoriaPie({ data, colors = DEFAULT_COLORS 
             outerRadius={80}
             label
           >
-            {data.map((entry, index) => (
+            {data.map((_entry, index) => (
               <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
             ))}
           </Pie>

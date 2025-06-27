@@ -1,8 +1,8 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaHome, FaSignOutAlt, FaDollarSign, FaArrowDown, FaTags } from "react-icons/fa";
-import { useAuth } from "../contexts/AuthContext";
 import logoGraficoSemFundo from '../assets/logo_grafico_sem_fundo.png';
 import logoNomeSemFundo from '../assets/logo_nome_sem_fundo.png';
+import { useAuth } from "../contexts/useAuth";
 
 export default function Sidebar() {
   const { logout } = useAuth();
