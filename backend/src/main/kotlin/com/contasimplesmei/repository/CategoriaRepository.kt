@@ -2,7 +2,7 @@ package com.contasimplesmei.repository
 
 import com.contasimplesmei.model.Categoria
 import org.springframework.data.jpa.repository.JpaRepository
-import java.util.*
+import java.util.UUID
 
 interface CategoriaRepository : JpaRepository<Categoria, UUID> {
     fun findAllByTipoAndAtivoTrueAndUsuarioId(

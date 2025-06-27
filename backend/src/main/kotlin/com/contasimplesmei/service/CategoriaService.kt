@@ -37,7 +37,7 @@ class CategoriaService(
                         "tipo.categoria.invalido",
                         null,
                         LocaleContextHolder.getLocale(),
-                    )
+                    ),
                 )
             }
 
@@ -63,29 +63,35 @@ class CategoriaService(
         val categoria =
             repository
                 .findById(id)
-                .orElseThrow { EntityNotFoundException(
-                    messageSource.getMessage(
-                        "categoria.nao.encontrada",
-                        null,
-                        LocaleContextHolder.getLocale(),
+                .orElseThrow {
+                    EntityNotFoundException(
+                        messageSource.getMessage(
+                            "categoria.nao.encontrada",
+                            null,
+                            LocaleContextHolder.getLocale(),
+                        ),
                     )
-                ) }
+                }
 
         if (categoria.usuario.id != usuarioLogado.id) {
-            throw BusinessException(messageSource.getMessage(
-                "categoria.nao.pertence.usuario.logado",
-                null,
-                LocaleContextHolder.getLocale(),
-            ))
+            throw BusinessException(
+                messageSource.getMessage(
+                    "categoria.nao.pertence.usuario.logado",
+                    null,
+                    LocaleContextHolder.getLocale(),
+                ),
+            )
         }
 
-        if (!categoria.ativo) throw BusinessException(
-            messageSource.getMessage(
-                "categoria.inativa",
-                null,
-                LocaleContextHolder.getLocale(),
+        if (!categoria.ativo) {
+            throw BusinessException(
+                messageSource.getMessage(
+                    "categoria.inativa",
+                    null,
+                    LocaleContextHolder.getLocale(),
+                ),
             )
-        )
+        }
 
         val categoriaInativa = categoria.copy(ativo = false)
         repository.save(categoriaInativa)

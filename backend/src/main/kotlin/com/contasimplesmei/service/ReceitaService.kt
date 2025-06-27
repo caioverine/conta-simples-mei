@@ -35,13 +35,15 @@ class ReceitaService(
     }
 
     fun buscarPorId(id: UUID): ReceitaResponseDTO? =
-        repository.findById(id).orElseThrow { EntityNotFoundException(
-            messageSource.getMessage(
-                "receita.nao.encontrada",
-                null,
-                LocaleContextHolder.getLocale(),
+        repository.findById(id).orElseThrow {
+            EntityNotFoundException(
+                messageSource.getMessage(
+                    "receita.nao.encontrada",
+                    null,
+                    LocaleContextHolder.getLocale(),
+                ),
             )
-        ) }.toResponseDTO()
+        }.toResponseDTO()
 
     @Transactional
     fun criar(dto: ReceitaRequestDTO): ReceitaResponseDTO {
@@ -53,13 +55,15 @@ class ReceitaService(
         val receitaCompleta =
             repository
                 .findByIdWithCategoria(receitaSalva.id!!, usuarioLogado.id!!)
-                .orElseThrow { EntityNotFoundException(
-                    messageSource.getMessage(
-                        "receita.nao.encontrada",
-                        null,
-                        LocaleContextHolder.getLocale(),
+                .orElseThrow {
+                    EntityNotFoundException(
+                        messageSource.getMessage(
+                            "receita.nao.encontrada",
+                            null,
+                            LocaleContextHolder.getLocale(),
+                        ),
                     )
-                ) }
+                }
         return receitaCompleta.toResponseDTO()
     }
 
@@ -80,7 +84,7 @@ class ReceitaService(
                         "receita.nao.encontrada",
                         null,
                         LocaleContextHolder.getLocale(),
-                    )
+                    ),
                 )
 
         val categoria = categoriaRepository.findByIdAndUsuarioId(dto.idCategoria, usuarioLogado.id!!)
@@ -103,13 +107,15 @@ class ReceitaService(
         val receita =
             repository
                 .findById(id)
-                .orElseThrow { EntityNotFoundException(
-                    messageSource.getMessage(
-                        "receita.nao.encontrada",
-                        null,
-                        LocaleContextHolder.getLocale(),
+                .orElseThrow {
+                    EntityNotFoundException(
+                        messageSource.getMessage(
+                            "receita.nao.encontrada",
+                            null,
+                            LocaleContextHolder.getLocale(),
+                        ),
                     )
-                ) }
+                }
 
         if (receita.usuario.id != usuarioLogado.id) {
             throw BusinessException(
@@ -117,17 +123,19 @@ class ReceitaService(
                     "receita.pertence.outro.usuario",
                     null,
                     LocaleContextHolder.getLocale(),
-                )
+                ),
             )
         }
 
-        if (!receita.ativo) throw BusinessException(
-            messageSource.getMessage(
-                "receita.inativa",
-                null,
-                LocaleContextHolder.getLocale(),
+        if (!receita.ativo) {
+            throw BusinessException(
+                messageSource.getMessage(
+                    "receita.inativa",
+                    null,
+                    LocaleContextHolder.getLocale(),
+                ),
             )
-        )
+        }
 
         val receitaInativa = receita.copy(ativo = false)
         repository.save(receitaInativa)

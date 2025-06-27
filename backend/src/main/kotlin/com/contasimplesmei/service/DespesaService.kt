@@ -16,7 +16,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
+import java.util.UUID
 
 @Service
 class DespesaService(
@@ -35,13 +35,15 @@ class DespesaService(
     }
 
     fun buscarPorId(id: UUID): DespesaResponseDTO? =
-        repository.findById(id).orElseThrow { EntityNotFoundException(
-            messageSource.getMessage(
-                "despesa.nao.encontrada",
-                null,
-                LocaleContextHolder.getLocale(),
+        repository.findById(id).orElseThrow {
+            EntityNotFoundException(
+                messageSource.getMessage(
+                    "despesa.nao.encontrada",
+                    null,
+                    LocaleContextHolder.getLocale(),
+                ),
             )
-        ) }.toResponseDTO()
+        }.toResponseDTO()
 
     @Transactional
     fun criar(dto: DespesaRequestDTO): DespesaResponseDTO {
@@ -52,13 +54,15 @@ class DespesaService(
         val despesSalva = repository.save(dto.toEntity(usuarioLogado, categoria))
         val despesaCompleta =
             repository.findByIdWithCategoria(despesSalva.id!!, usuarioLogado.id!!)
-                .orElseThrow { EntityNotFoundException(
-                    messageSource.getMessage(
-                        "despesa.nao.encontrada",
-                        null,
-                        LocaleContextHolder.getLocale(),
+                .orElseThrow {
+                    EntityNotFoundException(
+                        messageSource.getMessage(
+                            "despesa.nao.encontrada",
+                            null,
+                            LocaleContextHolder.getLocale(),
+                        ),
                     )
-                ) }
+                }
         return despesaCompleta.toResponseDTO()
     }
 
@@ -78,7 +82,7 @@ class DespesaService(
                         "despesa.nao.encontrada",
                         null,
                         LocaleContextHolder.getLocale(),
-                    )
+                    ),
                 )
 
         val categoria = categoriaRepository.findByIdAndUsuarioId(dto.idCategoria, usuarioLogado.id!!)
@@ -100,13 +104,15 @@ class DespesaService(
 
         val despesa =
             repository.findById(id)
-                .orElseThrow { EntityNotFoundException(
-                    messageSource.getMessage(
-                        "despesa.nao.encontrada",
-                        null,
-                        LocaleContextHolder.getLocale(),
+                .orElseThrow {
+                    EntityNotFoundException(
+                        messageSource.getMessage(
+                            "despesa.nao.encontrada",
+                            null,
+                            LocaleContextHolder.getLocale(),
+                        ),
                     )
-                ) }
+                }
 
         if (despesa.usuario.id != usuarioLogado.id) {
             throw BusinessException(
@@ -114,7 +120,7 @@ class DespesaService(
                     "despesa.pertence.outro.usuario",
                     null,
                     LocaleContextHolder.getLocale(),
-                )
+                ),
             )
         }
 
@@ -124,7 +130,7 @@ class DespesaService(
                     "despesa.inativa",
                     null,
                     LocaleContextHolder.getLocale(),
-                )
+                ),
             )
         }
 
