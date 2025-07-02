@@ -8,10 +8,12 @@ COPY build.gradle.kts .
 COPY gradle gradle
 COPY src src
 
-RUN gradle bootJar --no-daemon
+RUN ./gradlew build -x test
 
 # Etapa de execução
 FROM openjdk:17-jdk-slim
+WORKDIR /app
 VOLUME /tmp
 COPY --from=build /app/build/libs/*.jar app.jar
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app.jar"]

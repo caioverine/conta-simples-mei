@@ -1,34 +1,15 @@
 version: "3.8"
 
 services:
-  postgres:
-    image: postgres:15
-    container_name: db_postgres_staging
-    environment:
-      POSTGRES_DB: contasimplesmei_staging
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5433:5432" # Porta diferente do dev
-    volumes:
-      - pgdata-staging:/var/lib/postgresql/data
-    networks:
-      - app-network
-
   app:
     build: .
     container_name: conta-simples-api-staging
-    depends_on:
-      - postgres
     environment:
       SPRING_PROFILES_ACTIVE: staging
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/contasimplesmei_staging
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://conta-simples-mei-staging-db.c9ku2es68fz9.us-east-2.rds.amazonaws.com:5432/conta-simples-mei-staging-db
+      SPRING_DATASOURCE_USERNAME: postgree_adm
+      SPRING_DATASOURCE_PASSWORD: mITpWYWCvXMfslnyEXCM
     ports:
-      - "8081:8080" # Porta diferente do dev
+      - "8080:8080" # Porta diferente do dev
     networks:
       - app-network
-
-volumes:
-  pgdata-staging:
