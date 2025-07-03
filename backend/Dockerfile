@@ -3,6 +3,7 @@ FROM gradle:8.7.0-jdk17 AS build
 WORKDIR /app
 
 # Copia apenas arquivos necessários para o build (melhora cache)
+COPY gradlew .
 COPY settings.gradle.kts .
 COPY build.gradle.kts .
 COPY gradle gradle
