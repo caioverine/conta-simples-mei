@@ -27,4 +27,4 @@ jobs:
 
       - name: Executar docker-compose na EC2
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "cd ${{ secrets.EC2_DEPLOY_PATH }} && docker-compose -f docker-compose.staging.yml up -d --build"
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && docker-compose -f docker-compose.staging.yml up -d --build"
