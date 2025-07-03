@@ -13,3 +13,7 @@ services:
       - "8080:8080" # Porta diferente do dev
     networks:
       - app-network
+
+networks:
+  app-network:
+    driver: bridge
