@@ -1,5 +1,4 @@
 name: Deploy to EC2 (Staging)
-
 on:
   push:
     branches:
@@ -9,22 +8,50 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: STAGING
-
+    
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
+        
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Copiar arquivos para EC2
+          
+      - name: Copiar arquivos para EC2 (excluindo desnecessários)
         run: |
-          rsync -avz --exclude '.git' ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.EC2_DEPLOY_PATH }}
-
-      - name: Executar docker-compose na EC2
+          rsync -avz \
+            --exclude '.git' \
+            --exclude 'node_modules' \
+            --exclude '*.log' \
+            --exclude '.gradle' \
+            --exclude 'build' \
+            --exclude '.idea' \
+            --exclude '*.md' \
+            ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.EC2_DEPLOY_PATH }}
+            
+      - name: Limpar cache Docker antigo no EC2
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && docker-compose -f docker-compose.staging.yml up -d --build"
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && 
+            docker system prune -f --filter until=72h
+          "
+          
+      - name: Executar docker-compose na EC2 com cache otimizado
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && 
+            DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f docker-compose.staging.yml up -d --build
+          "
+          
+      - name: Verificar status da aplicação
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && 
+            docker-compose -f docker-compose.staging.yml ps &&
+            echo 'Aguardando aplicação iniciar...' &&
+            sleep 30 &&
+            curl -f http://localhost:8080/actuator/health || echo 'Health check falhou'
+          "
