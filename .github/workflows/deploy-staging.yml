@@ -38,27 +38,11 @@ jobs:
             docker system prune -f --filter until=72h
           "
           
-      - name: Verificar e instalar Docker Buildx se necessário
-        run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-            if ! docker buildx version &>/dev/null; then
-              echo 'Docker Buildx não encontrado. Instalando...'
-              mkdir -p ~/.docker/cli-plugins/
-              curl -L https://github.com/docker/buildx/releases/latest/download/buildx-v0.12.1.linux-amd64 -o ~/.docker/cli-plugins/docker-buildx
-              chmod +x ~/.docker/cli-plugins/docker-buildx
-              echo 'Docker Buildx instalado com sucesso:'
-              docker buildx version
-            else
-              echo 'Docker Buildx já está instalado:'
-              docker buildx version
-            fi
-          "
-          
-      - name: Executar docker-compose na EC2 com cache otimizado
+      - name: Executar docker-compose na EC2 (sem BuildKit)
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
             cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && 
-            DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f docker-compose.staging.yml up -d --build
+            DOCKER_BUILDKIT=0 docker-compose -f docker-compose.staging.yml up -d --build
           "
           
       - name: Verificar status da aplicação
