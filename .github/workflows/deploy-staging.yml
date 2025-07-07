@@ -1,10 +1,11 @@
-name: Deploy to EC2 (Staging) - Otimizado
+name: Deploy to EC2 (Staging) - Remote Build
 on:
   push:
     branches:
       - staging
+
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     environment: STAGING
     
@@ -18,82 +19,66 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+      
+      # ===== BUILD REMOTO NO GITHUB ACTIONS =====
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
           
-      - name: Verificar mudanças e copiar apenas arquivos necessários
-        run: |
-          # Criar arquivo com hash dos arquivos importantes
-          find . -name "*.java" -o -name "*.kt" -o -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "pom.xml" -o -name "package.json" -o -name "Dockerfile" -o -name "docker-compose*.yml" | 
-          sort | xargs md5sum > .current_hash
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/myapp:latest,${{ secrets.DOCKER_USERNAME }}/myapp:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
           
-          # Copiar apenas se houver mudanças
-          rsync -avz --checksum \
-            --exclude '.git' \
-            --exclude 'node_modules' \
-            --exclude '*.log' \
-            --exclude '.gradle' \
-            --exclude 'build' \
-            --exclude '.idea' \
-            --exclude '*.md' \
-            --exclude 'target' \
-            ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.EC2_DEPLOY_PATH }}
-            
-      - name: Limpeza inteligente de cache Docker
+      # ===== DEPLOY NO EC2 (APENAS PULL) =====
+      - name: Deploy to EC2
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-            cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && 
+            cd ${{ secrets.EC2_DEPLOY_PATH }}/backend
             
-            # Remover apenas containers parados e imagens não utilizadas
-            docker container prune -f
+            # Parar containers existentes
+            docker-compose -f docker-compose.staging.yml down || true
+            
+            # Limpar imagens antigas
             docker image prune -f
             
-            # Limpar cache build apenas se muito antigo (7 dias)
-            docker builder prune -f --filter until=168h
-          "
-          
-      - name: Build otimizado com cache Docker
-        run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-            cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && 
+            # Fazer login no Docker Hub
+            echo '${{ secrets.DOCKER_PASSWORD }}' | docker login -u '${{ secrets.DOCKER_USERNAME }}' --password-stdin
             
-            # Verificar se precisa rebuild comparando hash
-            REBUILD_NEEDED=true
-            if [ -f .last_deploy_hash ] && [ -f .current_hash ]; then
-              if cmp -s .last_deploy_hash .current_hash; then
-                echo 'Nenhuma mudança detectada nos arquivos críticos'
-                REBUILD_NEEDED=false
-              fi
-            fi
+            # Pull da nova imagem
+            docker pull ${{ secrets.DOCKER_USERNAME }}/myapp:latest
             
-            if [ \"\$REBUILD_NEEDED\" = true ]; then
-              echo 'Executando build com cache...'
-              DOCKER_BUILDKIT=0 docker-compose -f docker-compose.staging.yml build --parallel
-              docker-compose -f docker-compose.staging.yml up -d
-              
-              # Salvar hash para próxima comparação
-              cp .current_hash .last_deploy_hash
-            else
-              echo 'Apenas reiniciando containers existentes...'
-              docker-compose -f docker-compose.staging.yml up -d
-            fi
-          "
-          
-      - name: Health check otimizado
-        run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-            cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && 
+            # Subir containers
+            docker-compose -f docker-compose.staging.yml up -d
             
-            # Verificar se containers estão rodando
-            if ! docker-compose -f docker-compose.staging.yml ps --services --filter 'status=running' | grep -q app; then
-              echo 'Container não está rodando. Aguardando...'
-              sleep 15
-            fi
+            # Aguardar inicialização
+            sleep 30
             
-            # Health check com timeout
-            timeout 60s bash -c 'until curl -sf http://localhost:8080/actuator/health; do sleep 2; done' || {
-              echo 'Health check falhou após 60s'
+            # Verificar status
+            docker-compose -f docker-compose.staging.yml ps
+            
+            # Health check
+            timeout 60s bash -c 'until curl -sf http://localhost:8080/actuator/health; do echo \"Aguardando...\"; sleep 5; done' || {
+              echo 'Health check falhou'
               docker-compose -f docker-compose.staging.yml logs --tail=50
               exit 1
             }
             
-            echo 'Deploy finalizado com sucesso!'
+            echo '🚀 Deploy concluído com sucesso!'
           "
+          
+      - name: Cleanup
+        if: always()
+        run: |
+          # Limpar credenciais SSH
+          rm -f ~/.ssh/id_rsa
