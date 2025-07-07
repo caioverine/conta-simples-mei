@@ -22,7 +22,9 @@ RUN ./gradlew build --no-daemon && \
 FROM eclipse-temurin:17-jre
 
 # Instalar apenas o essencial
-RUN apk add --no-cache curl wget tzdata
+RUN apt-get update && \
+    apt-get install -y curl wget tzdata && \
+    rm -rf /var/lib/apt/lists/*
 
 # Configurar timezone
 ENV TZ=America/Sao_Paulo
