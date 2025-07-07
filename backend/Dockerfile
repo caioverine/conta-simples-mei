@@ -19,7 +19,7 @@ RUN ./gradlew build --no-daemon && \
     rm -rf ~/.gradle/caches/
 
 # Runtime stage - otimizado para t2.micro
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-jre
 
 # Instalar apenas o essencial
 RUN apk add --no-cache curl wget tzdata
