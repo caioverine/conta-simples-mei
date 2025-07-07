@@ -9,8 +9,19 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://conta-simples-mei-staging-db.c9ku2es68fz9.us-east-2.rds.amazonaws.com:5432/conta-simples-mei-staging-db
       SPRING_DATASOURCE_USERNAME: postgree_adm
       SPRING_DATASOURCE_PASSWORD: mITpWYWCvXMfslnyEXCM
+      JAVA_OPTS: -Xmx400m -Xms128m
+    restart: unless-stopped
     ports:
       - "8080:8080" # Porta diferente do dev
+    # Limitar recursos do container
+    deploy:
+      resources:
+        limits:
+          memory: 600M
+          cpus: '0.8'
+        reservations:
+          memory: 300M
+          cpus: '0.4'
     networks:
       - app-network
 

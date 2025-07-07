@@ -1,4 +1,4 @@
-name: Deploy to EC2 (Staging)
+name: Deploy to EC2 (Staging) - Otimizado
 on:
   push:
     branches:
@@ -19,9 +19,14 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
           
-      - name: Copiar arquivos para EC2 (excluindo desnecessários)
+      - name: Verificar mudanças e copiar apenas arquivos necessários
         run: |
-          rsync -avz \
+          # Criar arquivo com hash dos arquivos importantes
+          find . -name "*.java" -o -name "*.kt" -o -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "pom.xml" -o -name "package.json" -o -name "Dockerfile" -o -name "docker-compose*.yml" | 
+          sort | xargs md5sum > .current_hash
+          
+          # Copiar apenas se houver mudanças
+          rsync -avz --checksum \
             --exclude '.git' \
             --exclude 'node_modules' \
             --exclude '*.log' \
@@ -29,28 +34,66 @@ jobs:
             --exclude 'build' \
             --exclude '.idea' \
             --exclude '*.md' \
+            --exclude 'target' \
             ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.EC2_DEPLOY_PATH }}
             
-      - name: Limpar cache Docker antigo no EC2
+      - name: Limpeza inteligente de cache Docker
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
             cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && 
-            docker system prune -f --filter until=72h
+            
+            # Remover apenas containers parados e imagens não utilizadas
+            docker container prune -f
+            docker image prune -f
+            
+            # Limpar cache build apenas se muito antigo (7 dias)
+            docker builder prune -f --filter until=168h
           "
           
-      - name: Executar docker-compose na EC2 (sem BuildKit)
+      - name: Build otimizado com cache Docker
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
             cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && 
-            DOCKER_BUILDKIT=0 docker-compose -f docker-compose.staging.yml up -d --build
+            
+            # Verificar se precisa rebuild comparando hash
+            REBUILD_NEEDED=true
+            if [ -f .last_deploy_hash ] && [ -f .current_hash ]; then
+              if cmp -s .last_deploy_hash .current_hash; then
+                echo 'Nenhuma mudança detectada nos arquivos críticos'
+                REBUILD_NEEDED=false
+              fi
+            fi
+            
+            if [ \"\$REBUILD_NEEDED\" = true ]; then
+              echo 'Executando build com cache...'
+              DOCKER_BUILDKIT=0 docker-compose -f docker-compose.staging.yml build --parallel
+              docker-compose -f docker-compose.staging.yml up -d
+              
+              # Salvar hash para próxima comparação
+              cp .current_hash .last_deploy_hash
+            else
+              echo 'Apenas reiniciando containers existentes...'
+              docker-compose -f docker-compose.staging.yml up -d
+            fi
           "
           
-      - name: Verificar status da aplicação
+      - name: Health check otimizado
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
             cd ${{ secrets.EC2_DEPLOY_PATH }}/backend && 
-            docker-compose -f docker-compose.staging.yml ps &&
-            echo 'Aguardando aplicação iniciar...' &&
-            sleep 30 &&
-            curl -f http://localhost:8080/actuator/health || echo 'Health check falhou'
+            
+            # Verificar se containers estão rodando
+            if ! docker-compose -f docker-compose.staging.yml ps --services --filter 'status=running' | grep -q app; then
+              echo 'Container não está rodando. Aguardando...'
+              sleep 15
+            fi
+            
+            # Health check com timeout
+            timeout 60s bash -c 'until curl -sf http://localhost:8080/actuator/health; do sleep 2; done' || {
+              echo 'Health check falhou após 60s'
+              docker-compose -f docker-compose.staging.yml logs --tail=50
+              exit 1
+            }
+            
+            echo 'Deploy finalizado com sucesso!'
           "
