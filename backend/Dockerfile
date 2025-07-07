@@ -15,10 +15,11 @@ RUN ./gradlew --no-daemon dependencies || true
 COPY src ./src
 
 # Build com recursos adequados (GitHub Actions tem 7GB RAM)
-RUN ./gradlew clean build -x test --no-daemon --info
+RUN ./gradlew build --no-daemon && \
+    rm -rf ~/.gradle/caches/
 
 # Runtime stage - otimizado para t2.micro
-FROM eclipse-temurin:17-jre-alpine
+FROM openjdk:17-jre-slim
 
 # Instalar apenas o essencial
 RUN apk add --no-cache curl wget tzdata

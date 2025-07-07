@@ -10,6 +10,15 @@ jobs:
     environment: STAGING
     
     steps:
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker system prune -af
+          sudo apt-get clean
+          df -h
       - name: Checkout do código
         uses: actions/checkout@v4
         
