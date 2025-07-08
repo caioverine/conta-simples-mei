@@ -33,9 +33,7 @@ jobs:
           sudo docker system prune -af
           sudo apt-get clean
           sudo apt-get autoremove -y
-          # Limpar cache do apt
           sudo rm -rf /var/lib/apt/lists/*
-          # Verificar espaço disponível
           df -h
 
       - name: Checkout do código
@@ -47,6 +45,53 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+      
+      # ===== LIMPEZA AGRESSIVA NO EC2 ANTES DO DEPLOY =====
+      - name: Pre-deploy cleanup on EC2
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            echo '🧹 Iniciando limpeza no EC2...'
+            
+            # Parar todos os containers
+            docker stop \$(docker ps -aq) 2>/dev/null || true
+            
+            # Remover containers parados
+            docker container prune -f
+            
+            # Remover imagens não utilizadas (exceto a atual se existir)
+            docker image prune -a -f
+            
+            # Remover volumes órfãos
+            docker volume prune -f
+            
+            # Remover networks não utilizadas
+            docker network prune -f
+            
+            # Remover cache de build
+            docker builder prune -a -f
+            
+            # Limpeza completa do sistema Docker
+            docker system prune -a -f --volumes
+            
+            # Verificar espaço disponível
+            echo '📊 Espaço em disco após limpeza:'
+            df -h
+            echo '🐳 Uso do Docker:'
+            docker system df
+            
+            # Limpar logs antigos
+            sudo find /var/log -type f -name '*.log' -mtime +7 -delete 2>/dev/null || true
+            sudo journalctl --vacuum-time=3d 2>/dev/null || true
+            
+            # Garantir que temos pelo menos 2GB livres
+            AVAILABLE_SPACE=\$(df / | tail -1 | awk '{print \$4}')
+            if [ \$AVAILABLE_SPACE -lt 2000000 ]; then
+              echo '❌ Espaço insuficiente. Disponível: '\$AVAILABLE_SPACE'KB'
+              exit 1
+            fi
+            
+            echo '✅ Limpeza concluída'
+          "
       
       # ===== BUILD REMOTO NO GITHUB ACTIONS =====
       - name: Set up Docker Buildx
@@ -69,24 +114,23 @@ jobs:
         with:
           context: ./backend
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/myapp:latest,${{ secrets.DOCKER_USERNAME }}/myapp:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/myapp:latest,${{ secrets.DOCKER_USERNAME }}/myapp:staging-${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
           build-args: |
             BUILDKIT_INLINE_CACHE=1
-            # Otimizações para economizar espaço
-            GRADLE_OPTS=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+UseG1GC
-          # Limitar recursos para evitar overconsumption
-          shm-size: 2g
+            # Otimizações para economizar espaço e memória
+            GRADLE_OPTS=-Xmx1g -XX:MaxMetaspaceSize=256m -XX:+UseG1GC -XX:+UseStringDeduplication
+          shm-size: 1g
+          # Usar squash para reduzir tamanho da imagem
+          outputs: type=image,name=${{ secrets.DOCKER_USERNAME }}/myapp,push=true,compression=gzip,compression-level=9
 
       - name: Cleanup Docker build cache
         if: always()
         run: |
-          # Limpar cache de build do Docker
           docker buildx prune -f
           docker system prune -af
-          # Verificar espaço após build
           df -h
           
       # ===== DEPLOY NO EC2 (APENAS PULL) =====
@@ -95,42 +139,90 @@ jobs:
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
             cd ${{ secrets.EC2_DEPLOY_PATH }}/backend
             
+            echo '🚀 Iniciando deploy...'
+            
             # Parar containers existentes
             docker-compose -f docker-compose.staging.yml down || true
-            
-            # Limpar imagens antigas e órfãs
-            docker image prune -f
-            docker system prune -f
             
             # Fazer login no Docker Hub
             echo '${{ secrets.DOCKER_PASSWORD }}' | docker login -u '${{ secrets.DOCKER_USERNAME }}' --password-stdin
             
-            # Pull da nova imagem
-            docker pull ${{ secrets.DOCKER_USERNAME }}/myapp:latest
+            # Pull da nova imagem com retry
+            echo '📥 Fazendo pull da imagem...'
+            for i in {1..3}; do
+              if docker pull ${{ secrets.DOCKER_USERNAME }}/myapp:latest; then
+                echo '✅ Pull realizado com sucesso'
+                break
+              else
+                echo '❌ Tentativa \$i falhou, tentando novamente...'
+                docker system prune -f
+                sleep 5
+              fi
+              if [ \$i -eq 3 ]; then
+                echo '❌ Falha no pull após 3 tentativas'
+                exit 1
+              fi
+            done
+            
+            # Verificar espaço antes de subir containers
+            AVAILABLE_SPACE=\$(df / | tail -1 | awk '{print \$4}')
+            if [ \$AVAILABLE_SPACE -lt 1000000 ]; then
+              echo '❌ Espaço insuficiente para subir containers'
+              exit 1
+            fi
             
             # Subir containers
+            echo '🔄 Subindo containers...'
             docker-compose -f docker-compose.staging.yml up -d
             
             # Aguardar inicialização
+            echo '⏳ Aguardando inicialização...'
             sleep 30
             
             # Verificar status
             docker-compose -f docker-compose.staging.yml ps
             
-            # Health check
+            # Health check com timeout menor
+            echo '🏥 Executando health check...'
             timeout 60s bash -c 'until curl -sf http://localhost:8080/actuator/health; do echo \"Aguardando...\"; sleep 5; done' || {
-              echo 'Health check falhou'
+              echo '❌ Health check falhou'
               docker-compose -f docker-compose.staging.yml logs --tail=50
               exit 1
             }
             
-            echo '🚀 Deploy concluído com sucesso!'
+            # Limpeza final - manter apenas a imagem atual
+            echo '🧹 Limpeza final...'
+            docker image prune -f
+            docker container prune -f
+            
+            # Remover imagens antigas (manter apenas as 2 mais recentes)
+            docker images ${{ secrets.DOCKER_USERNAME }}/myapp --format 'table {{.Repository}}:{{.Tag}} {{.ID}} {{.CreatedAt}}' | grep -v REPOSITORY | sort -k3 -r | tail -n +3 | awk '{print \$2}' | xargs -r docker rmi -f 2>/dev/null || true
+            
+            echo '✅ Deploy concluído com sucesso!'
+            echo '📊 Espaço final:'
+            df -h
+            docker system df
           "
           
       - name: Cleanup
         if: always()
         run: |
-          # Limpar credenciais SSH
           rm -f ~/.ssh/id_rsa
           docker system prune -af || true
           sudo apt-get clean || true
+          
+      # ===== MONITORAMENTO PÓS-DEPLOY =====
+      - name: Post-deploy monitoring
+        if: success()
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            echo '📈 Status pós-deploy:'
+            echo '🐳 Containers rodando:'
+            docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+            echo '💾 Uso de disco:'
+            df -h | grep -E '(Filesystem|/dev/)'
+            echo '🗂️ Uso do Docker:'
+            docker system df
+            echo '🔍 Últimas 10 linhas do log:'
+            docker-compose -f docker-compose.staging.yml logs --tail=10
+          "
