@@ -10,7 +10,18 @@ jobs:
     environment: STAGING
     
     steps:
-      - name: Free Disk Space
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Additional cleanup
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /usr/local/lib/android
@@ -19,6 +30,7 @@ jobs:
           sudo docker system prune -af
           sudo apt-get clean
           df -h
+
       - name: Checkout do código
         uses: actions/checkout@v4
         
@@ -48,6 +60,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
           
       # ===== DEPLOY NO EC2 (APENAS PULL) =====
       - name: Deploy to EC2

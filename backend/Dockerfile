@@ -9,14 +9,16 @@ COPY gradle/ ./gradle/
 RUN chmod +x gradlew
 
 # Download de dependências com recursos do GitHub Actions
-RUN ./gradlew --no-daemon dependencies || true
+RUN ./gradlew --no-daemon --max-workers=1 dependencies || true
 
 # Copiar código fonte
 COPY src ./src
 
 # Build com recursos adequados (GitHub Actions tem 7GB RAM)
-RUN ./gradlew build --no-daemon && \
-    rm -rf ~/.gradle/caches/
+RUN ./gradlew bootJar --no-daemon --max-workers=1 -x test && \
+    rm -rf ~/.gradle/caches/ && \
+    rm -rf ~/.gradle/wrapper/ && \
+    rm -rf /tmp/*
 
 # Runtime stage - otimizado para t2.micro
 FROM eclipse-temurin:17-jre
