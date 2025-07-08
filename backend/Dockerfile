@@ -33,8 +33,8 @@ RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 WORKDIR /app
 
 # Criar usuário não-root
-RUN addgroup -g 1001 -S appuser && \
-    adduser -S -D -u 1001 -G appuser appuser
+RUN addgroup -S appuser && \
+    adduser -S -D -G appuser appuser
 
 # Copiar JAR
 COPY --from=build --chown=appuser:appuser /app/build/libs/*.jar app.jar
