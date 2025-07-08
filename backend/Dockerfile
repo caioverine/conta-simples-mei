@@ -1,5 +1,12 @@
 # Build stage - executado no GitHub Actions
 FROM gradle:8.7.0-jdk17 AS build
+
+# Instalar apenas o necessário
+RUN apt-get update && apt-get install -y \
+    curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Copiar arquivos de configuração
@@ -14,11 +21,14 @@ RUN ./gradlew --no-daemon --max-workers=1 dependencies || true
 # Copiar código fonte
 COPY src ./src
 
-# Build com recursos adequados (GitHub Actions tem 7GB RAM)
-RUN ./gradlew bootJar --no-daemon --max-workers=1 -x test && \
-    rm -rf ~/.gradle/caches/ && \
-    rm -rf ~/.gradle/wrapper/ && \
-    rm -rf /tmp/*
+# Build da aplicação
+RUN ./gradlew --no-daemon --max-workers=1 build -x test --stacktrace \
+    && rm -rf ~/.gradle/caches/modules-2/modules-2.lock \
+    && rm -rf ~/.gradle/caches/*/plugin-resolution/ \
+    && rm -rf ~/.gradle/caches/*/scripts/ \
+    && rm -rf ~/.gradle/caches/*/scripts-remapped/ \
+    && rm -rf ~/.gradle/caches/*/fileHashes/ \
+    && find ~/.gradle/caches/ -name "*.lock" -type f -delete
 
 # Runtime stage - otimizado para t2.micro
 FROM eclipse-temurin:17-jre
@@ -45,6 +55,10 @@ COPY --from=build --chown=appuser:appuser /app/build/libs/*.jar app.jar
 RUN ls -la /app/ && test -f app.jar
 
 USER appuser
+
+# Configurar JVM para container
+ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport"
+
 EXPOSE 8080
 
 # JVM otimizada para t2.micro (máximo 400MB)

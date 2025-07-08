@@ -27,8 +27,15 @@ jobs:
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /opt/ghc
           sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf /usr/local/lib/node_modules
+          sudo rm -rf /usr/share/swift
           sudo docker system prune -af
           sudo apt-get clean
+          sudo apt-get autoremove -y
+          # Limpar cache do apt
+          sudo rm -rf /var/lib/apt/lists/*
+          # Verificar espaço disponível
           df -h
 
       - name: Checkout do código
@@ -44,6 +51,12 @@ jobs:
       # ===== BUILD REMOTO NO GITHUB ACTIONS =====
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            network=host
+          buildkitd-flags: |
+            --allow-insecure-entitlement network.host
+            --allow-insecure-entitlement security.insecure
         
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -62,6 +75,19 @@ jobs:
           platforms: linux/amd64
           build-args: |
             BUILDKIT_INLINE_CACHE=1
+            # Otimizações para economizar espaço
+            GRADLE_OPTS=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+UseG1GC
+          # Limitar recursos para evitar overconsumption
+          shm-size: 2g
+
+      - name: Cleanup Docker build cache
+        if: always()
+        run: |
+          # Limpar cache de build do Docker
+          docker buildx prune -f
+          docker system prune -af
+          # Verificar espaço após build
+          df -h
           
       # ===== DEPLOY NO EC2 (APENAS PULL) =====
       - name: Deploy to EC2
@@ -72,8 +98,9 @@ jobs:
             # Parar containers existentes
             docker-compose -f docker-compose.staging.yml down || true
             
-            # Limpar imagens antigas
+            # Limpar imagens antigas e órfãs
             docker image prune -f
+            docker system prune -f
             
             # Fazer login no Docker Hub
             echo '${{ secrets.DOCKER_PASSWORD }}' | docker login -u '${{ secrets.DOCKER_USERNAME }}' --password-stdin
@@ -105,3 +132,5 @@ jobs:
         run: |
           # Limpar credenciais SSH
           rm -f ~/.ssh/id_rsa
+          docker system prune -af || true
+          sudo apt-get clean || true

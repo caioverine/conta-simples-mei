@@ -56,3 +56,10 @@ target/
 
 # Kotlin
 *.kt.orig
+
+# Build outputs
+build/
+target/
+*.jar
+*.war
+*.ear
