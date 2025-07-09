@@ -38,7 +38,7 @@ RUN --mount=type=cache,target=/root/.gradle/caches \
     gradle --no-daemon --max-workers=1 build -x test --build-cache
 
 # Stage 3: Runtime otimizado
-FROM openjdk:17-jre-alpine AS runtime
+FROM amazoncorretto:17-alpine AS runtime
 WORKDIR /app
 
 # Instalar dependências mínimas
