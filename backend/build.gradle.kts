@@ -68,3 +68,14 @@ allOpen {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+tasks.withType<org.gradle.api.tasks.compile.JavaCompile> {
+    options.compilerArgs.add("-Xlint:none")
+    options.isDeprecation = false
+}
+
+// Cache de dependências
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+    resolutionStrategy.cacheDynamicVersionsFor(0, "seconds")
+}
