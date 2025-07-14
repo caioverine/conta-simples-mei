@@ -21,9 +21,7 @@ LICENSE*
 Thumbs.db
 
 # Build artifacts
-build/
 target/
-*.jar
 *.war
 *.ear
 *.class
