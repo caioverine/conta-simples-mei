@@ -16,11 +16,21 @@ class DatabaseConfig(private val env: Environment) {
 
         return if (databaseUrl != null && databaseUrl.startsWith("postgresql://")) {
             // Railway format: postgresql://user:pass@host:port/db
-            // Convert to: jdbc:postgresql://host:port/db
-            val jdbcUrl = databaseUrl.replace("postgresql://", "jdbc:postgresql://")
+            // Parse the URL to extract components
+            val uri = java.net.URI(databaseUrl)
+            val host = uri.host
+            val port = uri.port
+            val database = uri.path.substring(1) // Remove leading "/"
+            val userInfo = uri.userInfo.split(":")
+            val username = userInfo[0]
+            val password = userInfo[1]
+
+            val jdbcUrl = "jdbc:postgresql://$host:$port/$database"
 
             DataSourceBuilder.create()
                 .url(jdbcUrl)
+                .username(username)
+                .password(password)
                 .driverClassName("org.postgresql.Driver")
                 .build()
         } else {
