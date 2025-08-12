@@ -5,7 +5,44 @@ spring:
     serialization:
       INDENT_OUTPUT: true
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:prod}
   messages:
     basename: messages
     encoding: UTF-8
+
+server:
+  port: ${PORT:8080}
+
+---
+# Profile de desenvolvimento (local)
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/contasimplesmei
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+---
+# Profile de produção (Railway)
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
