@@ -1,12 +1,15 @@
-import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import type { Usuario } from "../model/usuario-model";
+import { cadastrarUsuario } from "../services/usuario-service";
+import { ModalSucesso } from "../components/ModalSucesso";
 
 export default function CadastroUsuario() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [senhaConfirmada, setSenhaConfirmada] = useState("");
+  const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleCadastro = async (e: React.FormEvent) => {
@@ -18,14 +21,16 @@ export default function CadastroUsuario() {
     }
 
     try {
-      await axios.post("http://localhost:8080/usuarios", {
-        nome: nome,
-        email: email,
-        senha: senha,
+      const usuario: Usuario = {
+        nome,
+        email,
+        senha,
         perfil: "USER"
-      });
+      };
 
-      alert("Usuário cadastrado com sucesso!");
+      await cadastrarUsuario(usuario);
+
+      setSuccess("Usuário cadastrado com sucesso!");
       navigate("/login");
     } catch (err) {
       console.log(err);
@@ -110,6 +115,12 @@ export default function CadastroUsuario() {
           </div>
         </div>
       </div>
+      {success && (
+        <ModalSucesso
+          mensagem={success}
+          onClose={() => setSuccess(null)}
+        />
+      )}
     </>
   );
 }
