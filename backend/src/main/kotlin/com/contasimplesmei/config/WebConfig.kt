@@ -10,7 +10,9 @@ class WebConfig : WebMvcConfigurer {
         registry.addMapping("/**")
             .allowedOrigins(
                 "http://localhost:5173",
-                "https://www.contasimplesmei.com")
+                "https://contasimplesmei.com",
+                "https://www.contasimplesmei.com",
+                "https://conta-simples-mei.vercel.app")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
             .allowCredentials(true)
