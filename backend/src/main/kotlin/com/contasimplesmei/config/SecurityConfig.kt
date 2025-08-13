@@ -45,7 +45,7 @@ class SecurityConfig(
     fun corsFilter(): CorsFilter {
         val corsConfig =
             CorsConfiguration().apply {
-                allowedOrigins = listOf("http://localhost:5173")
+                allowedOrigins = listOf("http://localhost:5173", "https://contasimplesmei.com", "https://www.contasimplesmei.com")
                 allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 allowedHeaders = listOf("*")
                 allowCredentials = true
