@@ -7,6 +7,7 @@ import CadastroUsuario from "../pages/CadastroUsuario";
 import Despesas from "../pages/Despesas/Despesas";
 import Categorias from "../pages/Categorias/Categorias";
 import { useAuth } from "../contexts/useAuth";
+import { AuthProvider } from "../contexts/AuthContext";
 
 export default function AppRoutes() {
   const { isAuthenticated, loadingAuth } = useAuth();
@@ -17,39 +18,41 @@ export default function AppRoutes() {
 
   return (
     <>
-      <Routes>
-        <Route path="/login" element={
-          <Login />
-          }
-        />
-        <Route path="/cadastro" element={<CadastroUsuario />} />
-
-        <Route
-            path="/*"
-            element={
-              <Layout>
-                <Routes>
-                  <Route
-                    path="/dashboard"
-                    element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-                  />
-                  <Route 
-                    path="/receitas" 
-                    element={isAuthenticated ? <Receitas /> : <Navigate to="/login" />}
-                  />
-                  <Route 
-                    path="/despesas" 
-                    element={isAuthenticated ? <Despesas /> : <Navigate to="/login" />}
-                  />
-                  <Route 
-                    path="/categorias" 
-                    element={isAuthenticated ? <Categorias /> : <Navigate to="/login" />}
-                  />
-                </Routes>
-              </Layout>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={
+            <Login />
             }
           />
-      </Routes>
+          <Route path="/cadastro" element={<CadastroUsuario />} />
+
+          <Route
+              path="/*"
+              element={
+                <Layout>
+                  <Routes>
+                    <Route
+                      path="/dashboard"
+                      element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+                    />
+                    <Route 
+                      path="/receitas" 
+                      element={isAuthenticated ? <Receitas /> : <Navigate to="/login" />}
+                    />
+                    <Route 
+                      path="/despesas" 
+                      element={isAuthenticated ? <Despesas /> : <Navigate to="/login" />}
+                    />
+                    <Route 
+                      path="/categorias" 
+                      element={isAuthenticated ? <Categorias /> : <Navigate to="/login" />}
+                    />
+                  </Routes>
+                </Layout>
+              }
+            />
+        </Routes>
+      </AuthProvider>
     </>
   );
 }

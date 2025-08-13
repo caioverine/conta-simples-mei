@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 import { useAuth } from "../contexts/useAuth";
 import { realizarLogin } from "../services/login-service";
@@ -9,6 +9,10 @@ export default function Login() {
     const [senha, setSenha] = useState("");
     const navigate = useNavigate();
     const { login } = useAuth();
+    const location = useLocation();
+
+    // Pega a rota que o usuário estava tentando acessar
+    const from = location.state?.from?.pathname || '/';
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -18,7 +22,7 @@ export default function Login() {
 
             login(response.data.token);
 
-            navigate("/dashboard");
+            navigate(from, { replace: true });
         } catch (err) {
             console.log(err);
             alert("Credenciais inválidas");

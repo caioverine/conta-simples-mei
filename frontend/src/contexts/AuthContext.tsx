@@ -4,10 +4,14 @@ import { AuthContext } from "./AuthContextValue";
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
-    if (storedToken) setToken(storedToken);
+    if (storedToken) {
+      setToken(storedToken);
+      setIsAuthenticated(true);
+    }
     setLoadingAuth(false);
   }, []);
 
@@ -22,7 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, isAuthenticated: !!token, loadingAuth, login, logout }}>
+    <AuthContext.Provider value={{ token, isAuthenticated, loadingAuth, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
