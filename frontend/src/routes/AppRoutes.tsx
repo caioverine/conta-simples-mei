@@ -18,10 +18,7 @@ export default function AppRoutes() {
   return (
     <>
       <Routes>
-        <Route path="/login" element={
-          <Login />
-          }
-        />
+        <Route path="/login" element={<Login />}/>
         <Route path="/cadastro" element={<CadastroUsuario />} />
 
         <Route
@@ -45,6 +42,7 @@ export default function AppRoutes() {
                     path="/categorias" 
                     element={isAuthenticated ? <Categorias /> : <Navigate to="/login" />}
                   />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Layout>
             }
