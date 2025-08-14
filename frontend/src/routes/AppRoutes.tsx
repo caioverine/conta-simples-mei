@@ -7,7 +7,6 @@ import CadastroUsuario from "../pages/CadastroUsuario";
 import Despesas from "../pages/Despesas/Despesas";
 import Categorias from "../pages/Categorias/Categorias";
 import { useAuth } from "../contexts/useAuth";
-import { AuthProvider } from "../contexts/AuthContext";
 
 export default function AppRoutes() {
   const { isAuthenticated, loadingAuth } = useAuth();
