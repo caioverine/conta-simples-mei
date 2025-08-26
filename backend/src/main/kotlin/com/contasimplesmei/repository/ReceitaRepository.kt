@@ -1,5 +1,6 @@
 package com.contasimplesmei.repository
 
+import com.contasimplesmei.dto.ResumoMensalReceitaDTO
 import com.contasimplesmei.model.Receita
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -7,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.util.Optional
 import java.util.UUID
 
@@ -66,4 +68,55 @@ interface ReceitaRepository : JpaRepository<Receita, UUID> {
         pageable: Pageable,
         idUsuario: UUID,
     ): Page<Receita>
+
+    /**
+     * Busca receitas por usuário e período
+     */
+    @Query("""
+        SELECT r FROM Receita r 
+        WHERE r.usuario.id = :usuarioId 
+        AND r.data BETWEEN :dataInicio AND :dataFim
+        ORDER BY r.data DESC
+    """)
+    fun findByUsuarioIdAndDataBetween(
+        @Param("usuarioId") usuarioId: UUID,
+        @Param("dataInicio") dataInicio: LocalDate,
+        @Param("dataFim") dataFim: LocalDate,
+    ): List<Receita>
+
+    /**
+     * Calcula total de receitas por período
+     */
+    @Query("""
+        SELECT COALESCE(SUM(r.valor), 0) 
+        FROM Receita r 
+        WHERE r.usuario.id = :usuarioId 
+        AND r.data BETWEEN :dataInicio AND :dataFim
+    """)
+    fun calcularTotalReceitasPorPeriodo(
+        @Param("usuarioId") usuarioId: UUID,
+        @Param("dataInicio") dataInicio: LocalDate,
+        @Param("dataFim") dataFim: LocalDate,
+    ): BigDecimal
+
+    /**
+     * Resumo mensal de receitas
+     */
+    @Query("""
+        SELECT new com.contasimples.dto.ResumoMensalReceitaDTO(
+            EXTRACT(MONTH FROM r.data),
+            EXTRACT(YEAR FROM r.data),
+            COALESCE(SUM(r.valor), 0),
+            COUNT(r)
+        )
+        FROM Receita r 
+        WHERE r.usuario.id = :usuarioId 
+        AND r.data >= :dataInicio
+        GROUP BY EXTRACT(YEAR FROM r.data), EXTRACT(MONTH FROM r.data)
+        ORDER BY EXTRACT(YEAR FROM r.data) DESC, EXTRACT(MONTH FROM r.data) DESC
+    """)
+    fun obterResumoMensalReceitas(
+        @Param("usuarioId") usuarioId: UUID,
+        @Param("dataInicio") dataInicio: LocalDate,
+    ): List<ResumoMensalReceitaDTO>
 }

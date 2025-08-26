@@ -1,6 +1,7 @@
 package com.contasimplesmei.repository
 
 import com.contasimplesmei.dto.CategoriaDespesaGroupProjection
+import com.contasimplesmei.dto.ResumoMensalDespesaDTO
 import com.contasimplesmei.model.Despesa
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.util.Optional
 import java.util.UUID
 
@@ -73,4 +75,55 @@ interface DespesaRepository : JpaRepository<Despesa, UUID> {
         pageable: Pageable,
         idUsuario: UUID,
     ): Page<Despesa>
+
+    /**
+     * Busca despesas por usuário e período
+     */
+    @Query("""
+        SELECT d FROM Despesa d 
+        WHERE d.usuario.id = :usuarioId 
+        AND d.data BETWEEN :dataInicio AND :dataFim
+        ORDER BY d.data DESC
+    """)
+    fun findByUsuarioIdAndDataBetween(
+        @Param("usuarioId") usuarioId: UUID,
+        @Param("dataInicio") dataInicio: LocalDate,
+        @Param("dataFim") dataFim: LocalDate,
+    ): List<Despesa>
+
+    /**
+     * Calcula total de despesas por período
+     */
+    @Query("""
+        SELECT COALESCE(SUM(d.valor), 0) 
+        FROM Despesa d 
+        WHERE d.usuario.id = :usuarioId 
+        AND d.data BETWEEN :dataInicio AND :dataFim
+    """)
+    fun calcularTotalDespesasPorPeriodo(
+        @Param("usuarioId") usuarioId: UUID,
+        @Param("dataInicio") dataInicio: LocalDate,
+        @Param("dataFim") dataFim: LocalDate,
+    ): BigDecimal
+
+    /**
+     * Resumo mensal de despesas
+     */
+    @Query("""
+        SELECT new com.contasimples.dto.ResumoMensalDespesaDTO(
+            EXTRACT(MONTH FROM d.data),
+            EXTRACT(YEAR FROM d.data),
+            COALESCE(SUM(d.valor), 0),
+            COUNT(d)
+        )
+        FROM Despesa d 
+        WHERE d.usuario.id = :usuarioId 
+        AND d.data >= :dataInicio
+        GROUP BY EXTRACT(YEAR FROM d.data), EXTRACT(MONTH FROM d.data)
+        ORDER BY EXTRACT(YEAR FROM d.data) DESC, EXTRACT(MONTH FROM d.data) DESC
+    """)
+    fun obterResumoMensalDespesas(
+        @Param("usuarioId") usuarioId: UUID,
+        @Param("dataInicio") dataInicio: LocalDate,
+    ): List<ResumoMensalDespesaDTO>
 }
