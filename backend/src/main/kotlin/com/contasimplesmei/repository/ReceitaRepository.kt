@@ -103,7 +103,7 @@ interface ReceitaRepository : JpaRepository<Receita, UUID> {
      * Resumo mensal de receitas
      */
     @Query("""
-        SELECT new com.contasimples.dto.ResumoMensalReceitaDTO(
+        SELECT new com.contasimplesmei.dto.ResumoMensalReceitaDTO(
             EXTRACT(MONTH FROM r.data),
             EXTRACT(YEAR FROM r.data),
             COALESCE(SUM(r.valor), 0),

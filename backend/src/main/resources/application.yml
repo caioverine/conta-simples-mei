@@ -24,11 +24,16 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:postgresql://localhost:5432/contasimplesmei
-    username: postgres
-    password: postgres
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/contasimplesmei}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
+    database-url: ${DATABASE_URL}
+    properties:
+      hibernate:
+        jdbc:
+          url: ${DATABASE_URL}
     hibernate:
       ddl-auto: create
     show-sql: true

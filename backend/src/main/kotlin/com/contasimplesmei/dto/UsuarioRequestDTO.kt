@@ -11,4 +11,5 @@ data class UsuarioRequestDTO(
     @field:SenhaForte
     val senha: String,
     val perfil: PerfilUsuarioEnum,
+    val cnpj: String,
 )

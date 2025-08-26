@@ -11,6 +11,7 @@ fun UsuarioRequestDTO.toEntity(senhaCriptografada: String): Usuario =
         email = this.email,
         senha = senhaCriptografada,
         perfil = this.perfil,
+        cnpj = this.cnpj,
     )
 
 fun Usuario.toResponseDTO(): UsuarioResponseDTO =

@@ -110,7 +110,7 @@ interface DespesaRepository : JpaRepository<Despesa, UUID> {
      * Resumo mensal de despesas
      */
     @Query("""
-        SELECT new com.contasimples.dto.ResumoMensalDespesaDTO(
+        SELECT new com.contasimplesmei.dto.ResumoMensalDespesaDTO(
             EXTRACT(MONTH FROM d.data),
             EXTRACT(YEAR FROM d.data),
             COALESCE(SUM(d.valor), 0),
