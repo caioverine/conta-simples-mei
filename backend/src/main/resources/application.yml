@@ -5,6 +5,12 @@ app:
 spring:
   application:
     name: conta-simples-mei
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
   jackson:
     serialization:
       INDENT_OUTPUT: true
@@ -13,6 +19,12 @@ spring:
   messages:
     basename: messages
     encoding: UTF-8
+
+notification:
+  channels:
+    das-reminder: "das-reminder-channel"
+    limite-mei: "limite-mei-channel"
+    backup: "backup-reminder-channel"
 
 server:
   port: ${PORT:8080}
