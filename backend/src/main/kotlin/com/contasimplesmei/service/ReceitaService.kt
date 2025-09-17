@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.util.UUID
 
 @Service
@@ -24,6 +25,7 @@ class ReceitaService(
     private val usuarioAutenticadoProvider: UsuarioAutenticadoProvider,
     private val repository: ReceitaRepository,
     private val categoriaRepository: CategoriaRepository,
+    private val notificacaoService: NotificacaoService
 ) {
     fun listarReceitasPaginadas(
         page: Int,
@@ -64,7 +66,17 @@ class ReceitaService(
                         ),
                     )
                 }
+
+        verificarLimiteMEIAposLancamento(usuarioLogado.id!!)
+
         return receitaCompleta.toResponseDTO()
+    }
+
+    private fun verificarLimiteMEIAposLancamento(usuarioId: UUID) {
+        val inicioAno = LocalDate.now().withDayOfYear(1)
+        val receitaAcumulada = repository.findReceitaAcumuladaAnoByUsuarioId(usuarioId, inicioAno) ?: 0.0
+
+        notificacaoService.criarAlerteLimiteMEI(usuarioId, receitaAcumulada)
     }
 
     @Transactional

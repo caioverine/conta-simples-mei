@@ -119,4 +119,6 @@ interface ReceitaRepository : JpaRepository<Receita, UUID> {
         @Param("usuarioId") usuarioId: UUID,
         @Param("dataInicio") dataInicio: LocalDate,
     ): List<ResumoMensalReceitaDTO>
+
+    fun findReceitaAcumuladaAnoByUsuarioId(id: UUID, toLocalDate: LocalDate): Double
 }

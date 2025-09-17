@@ -1,10 +1,14 @@
 package com.contasimplesmei.config
 
+import com.contasimplesmei.service.NotificacaoListenerService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.listener.PatternTopic
 import org.springframework.data.redis.listener.RedisMessageListenerContainer
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
@@ -27,6 +31,31 @@ class RedisConfig {
     fun container(connectionFactory: RedisConnectionFactory): RedisMessageListenerContainer {
         val container = RedisMessageListenerContainer()
         container.setConnectionFactory(connectionFactory)
+        return container
+    }
+
+    @Bean
+    fun messageListenerAdapter(
+        notificacaoListenerService: NotificacaoListenerService
+    ): MessageListenerAdapter {
+        return MessageListenerAdapter(notificacaoListenerService, "onMessage")
+    }
+
+    @Bean
+    fun redisMessageListenerContainer(
+        connectionFactory: RedisConnectionFactory,
+        messageListenerAdapter: MessageListenerAdapter,
+        @Value("\${notification.channels.das-reminder}") dasChannel: String,
+        @Value("\${notification.channels.limite-mei}") limiteChannel: String,
+        @Value("\${notification.channels.backup}") backupChannel: String
+    ): RedisMessageListenerContainer {
+        val container = RedisMessageListenerContainer()
+        container.setConnectionFactory(connectionFactory)
+
+        container.addMessageListener(messageListenerAdapter, PatternTopic(dasChannel))
+        container.addMessageListener(messageListenerAdapter, PatternTopic(limiteChannel))
+        container.addMessageListener(messageListenerAdapter, PatternTopic(backupChannel))
+
         return container
     }
 }
