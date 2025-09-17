@@ -74,7 +74,7 @@ class ReceitaService(
 
     private fun verificarLimiteMEIAposLancamento(usuarioId: UUID) {
         val inicioAno = LocalDate.now().withDayOfYear(1)
-        val receitaAcumulada = repository.findReceitaAcumuladaAnoByUsuarioId(usuarioId, inicioAno) ?: 0.0
+        val receitaAcumulada = repository.findReceitaAcumuladaAnoByUsuarioId(usuarioId, inicioAno, LocalDate.now()) ?: 0.0
 
         notificacaoService.criarAlerteLimiteMEI(usuarioId, receitaAcumulada)
     }

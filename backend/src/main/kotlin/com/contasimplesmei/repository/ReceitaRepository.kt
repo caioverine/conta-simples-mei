@@ -120,5 +120,11 @@ interface ReceitaRepository : JpaRepository<Receita, UUID> {
         @Param("dataInicio") dataInicio: LocalDate,
     ): List<ResumoMensalReceitaDTO>
 
-    fun findReceitaAcumuladaAnoByUsuarioId(id: UUID, toLocalDate: LocalDate): Double
+    @Query("""
+        SELECT COALESCE(SUM(r.valor), 0) 
+        FROM Receita r 
+        WHERE r.usuario.id = :id 
+        AND r.data BETWEEN :startOfYear AND :toLocalDate
+    """)
+    fun findReceitaAcumuladaAnoByUsuarioId(id: UUID, startOfYear: LocalDate, toLocalDate: LocalDate): Double
 }

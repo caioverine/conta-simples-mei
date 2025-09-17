@@ -40,7 +40,8 @@ class AgendadorService(
         usuarioRepository.findAll().forEach { usuario ->
             val receitaAcumulada = receitaRepository.findReceitaAcumuladaAnoByUsuarioId(
                 usuario.id!!,
-                inicioAno.toLocalDate()
+                inicioAno.toLocalDate(),
+                LocalDateTime.now().toLocalDate()
             ) ?: 0.0
 
             notificacaoService.criarAlerteLimiteMEI(usuario.id!!, receitaAcumulada)
